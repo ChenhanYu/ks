@@ -3,25 +3,23 @@ GSKS (General Stride Kernel Summation)
 INSTALL
 ---
 
-To install GSKS is to use makefile.
-GSKS has been tested on OSX and Linux. 
+GSKS is tested on LINUX and OSX
+REQUIRES Intel compilers and MKL. 
 
+LINUX:
+edit  set_env.sh and make.inc to set the paths to the libraries. 
 
-You should edit 
-    set_env.sh  or set_env_osx.sh
-and 
-     make.inc  or make.osx.inc
-to set variables to match your system.
+OSX: 
+edit  set_env_osx.sh and make.osx.inc to set the paths to the libraries. 
+edit the first line in makefile to change make.inc to make.osx.inc 
 
-OSX: edit the first line in makefile to change make.inc to make.osx.inc
-
-For LINUX:
+For LINUX (and similarly for OSX)
 >source set_env.sh
 >make
 
 GSKS requires c and c++ compilers that support OpenMP, and the
 default micro-kernel (uses AVX) requires the a Sandy-Bridge
-processor or any successor. We have tested GNU and Intel compilers.
+processor or any successor. 
 
 The current reference function requires the support of the MKL
 library which will be changed in the future. The default 
@@ -32,9 +30,9 @@ some basic example from the testing drivers:
 >./run_dgsks.sh
 >./run_dgsks_list.sh
 
-To embed GSKS in a specific application, you need to include the
+To us GSKS library you need to include the
 header files <ks.h> and <omp_dgsks_list.h> 
-and link GSKS statically with lib/libks.a.
+and link GSKS statically wich is in ${KS_DIR}/lib/libks.a.
 
 C/C++ example:
 ...
@@ -43,4 +41,4 @@ C/C++ example:
 ...
 
 Compilation example:
->gcc ... -I$(KS_DIR)/include $(KS_DIR)/lib/libks.a
+>icc ... -I$(KS_DIR)/include $(KS_DIR)/lib/libks.a
