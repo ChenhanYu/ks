@@ -1,0 +1,35 @@
+
+GSKS (General Stride Kernel Summation)
+Install
+---
+
+The simplest way (the only way) to install GSKS is to use makefile.
+
+>source set_env.sh
+>make
+
+GSKS requires c and c++ compilers that support OpenMP, and the
+default micro-kernel (written AXV) requires the a Sandy-Bridge
+processor or any successor.
+
+The currnet reference function requires the support of the MKL
+library which will be changed in the future. The default 
+compilation will also compile all the testing drivers. To run
+some basic example from the testing drivers:
+
+>cd test
+>./run_dgsks.sh
+>./run_dgsks_list.sh
+
+To embed GSKS in a specific application, you need to include the
+header files <ks.h> and <omp_dgsks_list.h> and make the right
+function calls. GSKS can be linked statically with lib/libks.a.
+
+C/C++ example:
+...
+#include <ks.h>
+#include <omp_dgsks_list.h>
+...
+
+Compilation example:
+>gcc ... -I$(KS_DIR)/include $(KS_DIR)/lib/libks.a
