@@ -360,7 +360,7 @@ void test_dgsks(
   //  error += tmp * tmp;
   //}
 
-  //compute_error( m, u, umkl );
+  compute_error( m, u, umkl );
 
   //printf( "%lf, %lf\n", umkl[ 0 ], u[ 0 ] );
 

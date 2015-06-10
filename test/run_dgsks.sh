@@ -17,25 +17,25 @@
 #done
 
 
-#m=2048
-#n=2048
-#
-#echo 'd_mn2048_gaussian = ['
-#for (( k=4; k<1028; k+=16 ))
-#do
-#  ./test_dgsks.x $m $n $k
-#done
+m=4097
+n=4097
 
-
-m=4096
-n=4096
-
-echo 'd_mn4096_tanh = ['
-for (( k=4; k<260; k+=4 ))
+echo 'd_mn2048_gaussian = ['
+for (( k=4; k<1028; k+=16 ))
 do
   ./test_dgsks.x $m $n $k
 done
-echo '];'
+
+
+#m=4096
+#n=4096
+#
+#echo 'd_mn4096_tanh = ['
+#for (( k=4; k<260; k+=4 ))
+#do
+#  ./test_dgsks.x $m $n $k
+#done
+#echo '];'
 
 
 #m=8192

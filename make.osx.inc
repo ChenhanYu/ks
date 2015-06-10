@@ -1,5 +1,7 @@
-CC = icc
-CXX = icpc
+//CC = icc
+//CXX = icpc
+CC = gcc
+CXX = g++
 ARCH = ar
 ARCHFLAGS = cr
 RANLIB = ranlib
