@@ -60,20 +60,20 @@ typedef union {
   unsigned long long u[ 4 ];
 } v4df_t;
 
-typedef union {
-  __m512d v;
-  double d[ 8 ];
-} v8df_t;
+//typedef union {
+//  __m512d v;
+//  double d[ 8 ];
+//} v8df_t;
 
 typedef union {
   __m128i v;
   int d[ 4 ];
 } v4li_t;
 
-typedef union {
-  __m512i v;
-  int d[ 16 ];
-} v16i_t;
+//typedef union {
+//  __m512i v;
+//  int d[ 16 ];
+//} v16i_t;
 
 
 

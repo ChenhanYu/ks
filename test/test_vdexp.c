@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
-#include <mkl.h>
+//#include <mkl.h>
 #include <ks.h>
 
 void exp_int_d4( double* );
@@ -50,7 +50,7 @@ void error_plot(
 int main()
 {
   int    i;
-  int    n = 1000;
+  int    n = 4;
   double beg, end, inc;
   double x[ n ];
   double y[ n ];
@@ -80,9 +80,9 @@ int main()
     exp_int_d4( y + i );
   }
 
-  compute_error( n, y, goal );
-  compute_error( n, gmkl, goal );
-  error_plot( n, x, y, gmkl, goal );
+  //compute_error( n, y, goal );
+  //compute_error( n, gmkl, goal );
+  //error_plot( n, x, y, gmkl, goal );
 
 
 

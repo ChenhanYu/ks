@@ -61,8 +61,8 @@ void exp_int_d4(
 
   v4df_t y, l2e, tmp, p;
   v4li_t k03_0;
-  v4li_t offset;
-  v4li_t k1, k2;
+  v4li_t offset, offset2, mask0;
+  v4li_t k1, k2, k3;
   __m128d p1, p2;
 
   
@@ -161,40 +161,72 @@ void exp_int_d4(
 
 
   offset.v      = _mm_setr_epi32( 1023, 1023, 0, 0 );
+  offset2.v     = _mm_setr_epi32( 1023, 1023, 1023, 1023 );
+  mask0.v     = _mm_setr_epi32( 0, 0, 0, 0 );
 
-  //printf( "offset\n" );
-  //printf( "%d, %d, %d, %d\n", offset.d[ 0 ], offset.d[ 1 ], offset.d[ 2 ], offset.d[ 3 ] );
+  printf( "offset\n" );
+  printf( "%d, %d, %d, %d\n", offset.d[ 0 ], offset.d[ 1 ], offset.d[ 2 ], offset.d[ 3 ] );
 
   k1.v          = _mm_set_epi32( 0, 0, k03_0.d[ 1 ], k03_0.d[ 0 ]);
   k2.v          = _mm_set_epi32( 0, 0, k03_0.d[ 3 ], k03_0.d[ 2 ]);
 
-  //printf( "k1\n" );
-  //printf( "%d, %d, %d, %d\n", k1.d[ 0 ], k1.d[ 1 ], k1.d[ 2 ], k1.d[ 3 ] );
+
+
+  printf( "k1\n" );
+  printf( "%d, %d, %d, %d\n", k1.d[ 0 ], k1.d[ 1 ], k1.d[ 2 ], k1.d[ 3 ] );
+  printf( "k2\n" );
+  printf( "%d, %d, %d, %d\n", k2.d[ 0 ], k2.d[ 1 ], k2.d[ 2 ], k2.d[ 3 ] );
 
   k1.v          = _mm_add_epi32( k1.v, offset.v );
   k2.v          = _mm_add_epi32( k2.v, offset.v );
+  k3.v          = _mm_add_epi32( k03_0.v, offset2.v );
 
-  //printf( "k1 after\n" );
-  //printf( "%d, %d, %d, %d\n", k1.d[ 0 ], k1.d[ 1 ], k1.d[ 2 ], k1.d[ 3 ] );
+
+  printf( "k1 after\n" );
+  printf( "%d, %d, %d, %d\n", k1.d[ 0 ], k1.d[ 1 ], k1.d[ 2 ], k1.d[ 3 ] );
+  printf( "k2 after\n" );
+  printf( "%d, %d, %d, %d\n", k2.d[ 0 ], k2.d[ 1 ], k2.d[ 2 ], k2.d[ 3 ] );
+  printf( "k3 after\n" );
+  printf( "%d, %d, %d, %d\n", k3.d[ 0 ], k3.d[ 1 ], k3.d[ 2 ], k3.d[ 3 ] );
 
 
   k1.v          = _mm_slli_epi32( k1.v, 20 );
-
-  //printf( "k1 shift\n" );
-  //printf( "%d, %d, %d, %d\n", k1.d[ 0 ], k1.d[ 1 ], k1.d[ 2 ], k1.d[ 3 ] );
-
   k2.v          = _mm_slli_epi32( k2.v, 20 );
-  k1.v          = _mm_shuffle_epi32( k1.v, _MM_SHUFFLE( 1, 3, 0, 2 ) );
+  k3.v          = _mm_slli_epi32( k3.v, 20 );
 
-  //printf( "k1 shuffle\n" );
-  //printf( "%d, %d, %d, %d\n", k1.d[ 0 ], k1.d[ 1 ], k1.d[ 2 ], k1.d[ 3 ] );
+  printf( "k1 shift\n" );
+  printf( "%d, %d, %d, %d\n", k1.d[ 0 ], k1.d[ 1 ], k1.d[ 2 ], k1.d[ 3 ] );
+  printf( "k2 shift\n" );
+  printf( "%d, %d, %d, %d\n", k2.d[ 0 ], k2.d[ 1 ], k2.d[ 2 ], k2.d[ 3 ] );
+  printf( "k3 shift\n" );
+  printf( "%d, %d, %d, %d\n", k3.d[ 0 ], k3.d[ 1 ], k3.d[ 2 ], k3.d[ 3 ] );
 
-  k2.v          = _mm_shuffle_epi32( k2.v, _MM_SHUFFLE( 1, 3, 0, 2 ) );
-  p1            = _mm_castsi128_pd( k1.v );
-  p2            = _mm_castsi128_pd( k2.v );
-  p03_0.v       = _mm256_set_m128d( p2, p1 );
+  //k1.v          = _mm_shuffle_epi32( k1.v, _MM_SHUFFLE( 1, 3, 0, 2 ) );
+  //k2.v          = _mm_shuffle_epi32( k2.v, _MM_SHUFFLE( 1, 3, 0, 2 ) );
 
-  //printf( "%E, %E, %E, %E\n", p03_0.d[ 0 ], p03_0.d[ 1 ], p03_0.d[ 2 ], p03_0.d[ 3 ] );
+  k1.v          = _mm_unpacklo_epi32( mask0.v, k3.v );
+  k2.v          = _mm_unpackhi_epi32( mask0.v, k3.v );
+
+  printf( "k1 shuffle\n" );
+  printf( "%d, %d, %d, %d\n", k1.d[ 0 ], k1.d[ 1 ], k1.d[ 2 ], k1.d[ 3 ] );
+  printf( "k2 shuffle\n" );
+  printf( "%d, %d, %d, %d\n", k2.d[ 0 ], k2.d[ 1 ], k2.d[ 2 ], k2.d[ 3 ] );
+
+  //p1            = _mm_castsi128_pd( k1.v );
+  //p2            = _mm_castsi128_pd( k2.v );
+  //p03_0.v       = _mm256_set_m128d( p2, p1 );
+  
+  
+  //p03_0.v       = _mm256_castsi256_pd( (__m256i)_mm256_set_m128i( k2.v, k1.v ) );
+  //p03_0.i       =  _mm256_set_m128i( k2.v, k1.v );
+  
+  //p03_0.i       =  _mm256_set_m128i( k2.v, k1.v );
+  p03_0.i       =  _mm256_insertf128_si256( p03_0.i, k1.v, 0 );
+  p03_0.i       =  _mm256_insertf128_si256( p03_0.i, k2.v, 1 );
+
+  
+
+  printf( "%E, %E, %E, %E\n", p03_0.d[ 0 ], p03_0.d[ 1 ], p03_0.d[ 2 ], p03_0.d[ 3 ] );
 
   c03_0.v       = _mm256_mul_pd( a03_0.v, p03_0.v );
 
