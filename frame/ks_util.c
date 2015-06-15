@@ -1,3 +1,26 @@
+/*
+ * --------------------------------------------------------------------------
+ * GSKS (General Stride Kernel Summation)
+ * --------------------------------------------------------------------------
+ * Copyright (C) 2014, The University of Texas at Austin
+ *
+ * ks_util.c
+ *
+ * Chenhan D. Yu - Department of Computer Science, 
+ *                 The University of Texas at Austin
+ *
+ *
+ * Purpose: 
+ *
+ *
+ * Todo:
+ *
+ *
+ * Modification:
+ *
+ *
+ * */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <omp.h>
