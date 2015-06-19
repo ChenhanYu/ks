@@ -36,6 +36,11 @@
  *
  * */
 
+#ifndef __OMP_DGSKS_LIST_HPP__
+#define __OMP_DGSKS_LIST_HPP__
+
+
+
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -108,3 +113,5 @@ void omp_dgsks_list(
     double *w,
     std::vector< std::vector<int> > &wlist
     );
+
+#endif

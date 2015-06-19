@@ -36,6 +36,11 @@
  *
  * */
 
+#ifndef __KS_H__
+#define __KS_H__
+
+
+
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -223,3 +228,5 @@ double *ks_malloc_aligned(
     int    n,
     int    size
     );
+
+#endif // defined __KS_H__

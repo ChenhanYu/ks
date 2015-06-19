@@ -24,7 +24,7 @@ void ks_gaussian_asm_d8x4(
   v4df_t aa_tmp, bb_tmp;
   v4df_t w_tmp;
 
-  posix_memalign( &c, (size_t)DKS_SIMD_ALIGN_SIZE, 
+  posix_memalign( (void**)&c, (size_t)DKS_SIMD_ALIGN_SIZE, 
         sizeof(double) * DKS_MR * DKS_NR );
 
   //printf( "pc = %d\n", aux->pc );
