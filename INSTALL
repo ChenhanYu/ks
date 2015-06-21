@@ -13,9 +13,17 @@ OSX:
 edit  set_env_osx.sh and make.osx.inc to set the paths to the libraries. 
 edit the first line in makefile to change make.inc to make.osx.inc 
 
-For LINUX (and similarly for OSX)
+For LINUX (and similarly for OSX), to use the standard makefil:
 >source set_env.sh
 >make
+
+For LINUX (and similarly for OSX), to use cmake:
+>source set_env.sh
+>mkdir build
+>cd build
+>cmake ..
+>make
+>make install
 
 GSKS requires c and c++ compilers that support OpenMP, and the
 default micro-kernel (uses AVX) requires the a Sandy-Bridge
