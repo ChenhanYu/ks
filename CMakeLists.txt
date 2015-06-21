@@ -23,8 +23,10 @@ ENABLE_TESTING()
 
 
 # Decide architecture
-set (KS_ARCH_MAJOR "x86_64")
-set (KS_ARCH_MINOR "sandybridge")
+#set (KS_ARCH_MAJOR "x86_64")
+set (KS_ARCH_MAJOR $ENV{KS_ARCH_MAJOR})
+#set (KS_ARCH_MINOR "sandybridge")
+set (KS_ARCH_MINOR $ENV{KS_ARCH_MINOR})
 set (KS_ARCH ${KS_ARCH_MAJOR}/${KS_ARCH_MINOR})
 
 
@@ -37,7 +39,8 @@ set (CMAKE_CXX_FLAGS    "${CMAKE_CXX_FLAGS} ${KS_CFLAGS}")
 
 
 # Software dependencies.
-set (MKL_DIR /opt/intel/mkl)
+#set (MKL_DIR /opt/intel/mkl)
+set (MKL_DIR $ENV{KS_MKL_DIR})
 
 
 # Linking infos.
@@ -77,11 +80,11 @@ message ("===================================================")
 message ("Version      =${KS_VERSION}")
 message ("Source       =${CMAKE_SOURCE_DIR}")
 message ("Target       =${CMAKE_BINARY_DIR}")
-message ("Architecture =${KS_ARCH}")
-message ("C Compiler   =${CMAKE_C_COMPILER}")
-message ("C flags      =${CMAKE_C_FLAGS}")
-message ("CXX Compiler =${CMAKE_CXX_COMPILER}")
-message ("CXX flags    =${CMAKE_CXX_FLAGS}")
+message ("KS_ARCH      =${KS_ARCH}")
+message ("CC           =${CMAKE_C_COMPILER}")
+message ("CFLAGS       =${CMAKE_C_FLAGS}")
+message ("CXX          =${CMAKE_CXX_COMPILER}")
+message ("CXXFLAGS     =${CMAKE_CXX_FLAGS}")
 message ("Linker       =${CMAKE_EXE_LINKER_FLAGS}")
 message ("MKLDIR       =${MKL_DIR}")
 message ("===================================================")
