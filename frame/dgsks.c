@@ -216,7 +216,7 @@ void packB_kcxnc(
   //double *b_i1_pntr;
   //double *b_i2_pntr;
   //double *b_i3_pntr;
-  double *packB_check = packB;
+  //double *packB_check = packB;
 
   double *b_pntr[ DKS_NR ];
 
@@ -276,6 +276,36 @@ void packB_kcxnc(
 
   //printf( "packB end\n" );
 }
+
+void packw_rhsxnc(
+    int    n,
+    int    rhs,
+    double *w,
+    int    ldw, // ldw should be rhs
+    int    *wmap,
+    double *packw
+    )
+{
+  int    j, p;
+  double *w_pntr[ DKS_NR ];
+
+  for ( j = 0; j < n; j ++ ) {
+    w_pntr[ j ] = w + ldw * wmap[ j ];
+  }
+
+  // Loop over rhs of w
+  for ( p = 0; p < rhs; p ++ ) {
+    for ( j = 0; j < n; j ++ ) {
+      *packw ++ = *w_pntr[ j ] ++;
+    }
+    // Edge case.
+    for ( j = n; j < DKS_NR; j ++ ) {
+      *packw ++ = 0.0;
+    }
+  }
+}
+
+
 
 
 /* 
@@ -838,12 +868,22 @@ void dgsks(
           
           if ( pc + DKS_KC >= k ) {
             // Initialize w
-            for ( jr = 0; jr < DKS_NR; jr ++ ) {
-              packw[ j + jr ] = 0.0;
-            }
+            //for ( jr = 0; jr < DKS_NR; jr ++ ) {
+            //  packw[ j + jr ] = 0.0;
+            //}
+
+            packw_rhsxnc(
+              min( jb - j, DKS_NR ),
+              KS_RHS,
+              w,
+              KS_RHS,
+              &wmap[ jc + j + jr ],
+              &packw[ j * KS_RHS ]
+              );
+
             // packw, packB2, packh (alternatively)
             for ( jr = 0; jr < min( jb - j, DKS_NR ); jr ++ ) {
-              packw[ j + jr ] = w[ wmap[ jc + j + jr ] ];
+              //packw[ j + jr ] = w[ wmap[ jc + j + jr ] ];
               if ( pack_norm ) {
                 packB2[ j + jr ] = XB2[ bmap[ jc + j + jr ] ];
               }
