@@ -72,17 +72,6 @@ void packA_kcxmc(
     )
 {
   int    i, p;
-  //double *a_i0_pntr;
-  //double *a_i1_pntr;
-  //double *a_i2_pntr;
-  //double *a_i3_pntr;
-  //double *a_i4_pntr;
-  //double *a_i5_pntr;
-  //double *a_i6_pntr;
-  //double *a_i7_pntr;
-
-  //double *packA_check = packA;
-
   double *a_pntr[ DKS_MR ];
 
   for ( i = 0; i < m; i ++ ) {
@@ -93,106 +82,114 @@ void packA_kcxmc(
     a_pntr[ i ] = XA + ldXA * amap[ 0 ];
   }
 
-
-  //printf( "packA check#0\n" );
-  //if ( m > 7 ) {
-  //  a_i0_pntr = XA + ldXA * amap[ 0 ];
-  //  a_i1_pntr = XA + ldXA * amap[ 1 ];
-  //  a_i2_pntr = XA + ldXA * amap[ 2 ];
-  //  a_i3_pntr = XA + ldXA * amap[ 3 ];
-  //  a_i4_pntr = XA + ldXA * amap[ 4 ];
-  //  a_i5_pntr = XA + ldXA * amap[ 5 ];
-  //  a_i6_pntr = XA + ldXA * amap[ 6 ];
-  //  a_i7_pntr = XA + ldXA * amap[ 7 ];
-  //}
-  //else if ( m > 6 ) {
-  //  a_i0_pntr = XA + ldXA * amap[ 0 ];
-  //  a_i1_pntr = XA + ldXA * amap[ 1 ];
-  //  a_i2_pntr = XA + ldXA * amap[ 2 ];
-  //  a_i3_pntr = XA + ldXA * amap[ 3 ];
-  //  a_i4_pntr = XA + ldXA * amap[ 4 ];
-  //  a_i5_pntr = XA + ldXA * amap[ 5 ];
-  //  a_i6_pntr = XA + ldXA * amap[ 6 ];
-  //  a_i7_pntr = XA + ldXA * amap[ 0 ];
-  //}
-  //else if ( m > 5 ) {
-  //  a_i0_pntr = XA + ldXA * amap[ 0 ];
-  //  a_i1_pntr = XA + ldXA * amap[ 1 ];
-  //  a_i2_pntr = XA + ldXA * amap[ 2 ];
-  //  a_i3_pntr = XA + ldXA * amap[ 3 ];
-  //  a_i4_pntr = XA + ldXA * amap[ 4 ];
-  //  a_i5_pntr = XA + ldXA * amap[ 5 ];
-  //  a_i6_pntr = XA + ldXA * amap[ 0 ];
-  //  a_i7_pntr = XA + ldXA * amap[ 0 ];
-  //}
-  //else if ( m > 4 ) {
-  //  a_i0_pntr = XA + ldXA * amap[ 0 ];
-  //  a_i1_pntr = XA + ldXA * amap[ 1 ];
-  //  a_i2_pntr = XA + ldXA * amap[ 2 ];
-  //  a_i3_pntr = XA + ldXA * amap[ 3 ];
-  //  a_i4_pntr = XA + ldXA * amap[ 4 ];
-  //  a_i5_pntr = XA + ldXA * amap[ 0 ];
-  //  a_i6_pntr = XA + ldXA * amap[ 0 ];
-  //  a_i7_pntr = XA + ldXA * amap[ 0 ];
-  //}
-  //else if ( m > 3 ) {
-  //  a_i0_pntr = XA + ldXA * amap[ 0 ];
-  //  a_i1_pntr = XA + ldXA * amap[ 1 ];
-  //  a_i2_pntr = XA + ldXA * amap[ 2 ];
-  //  a_i3_pntr = XA + ldXA * amap[ 3 ];
-  //  a_i4_pntr = XA + ldXA * amap[ 0 ];
-  //  a_i5_pntr = XA + ldXA * amap[ 0 ];
-  //  a_i6_pntr = XA + ldXA * amap[ 0 ];
-  //  a_i7_pntr = XA + ldXA * amap[ 0 ];
-  //}
-  //else if ( m > 2 ) {
-  //  a_i0_pntr = XA + ldXA * amap[ 0 ];
-  //  a_i1_pntr = XA + ldXA * amap[ 1 ];
-  //  a_i2_pntr = XA + ldXA * amap[ 2 ];
-  //  a_i3_pntr = XA + ldXA * amap[ 0 ];
-  //  a_i4_pntr = XA + ldXA * amap[ 0 ];
-  //  a_i5_pntr = XA + ldXA * amap[ 0 ];
-  //  a_i6_pntr = XA + ldXA * amap[ 0 ];
-  //  a_i7_pntr = XA + ldXA * amap[ 0 ];
-  //}
-  //else if ( m > 1 ) {
-  //  a_i0_pntr = XA + ldXA * amap[ 0 ];
-  //  a_i1_pntr = XA + ldXA * amap[ 1 ];
-  //  a_i2_pntr = XA + ldXA * amap[ 0 ];
-  //  a_i3_pntr = XA + ldXA * amap[ 0 ];
-  //  a_i4_pntr = XA + ldXA * amap[ 0 ];
-  //  a_i5_pntr = XA + ldXA * amap[ 0 ];
-  //  a_i6_pntr = XA + ldXA * amap[ 0 ];
-  //  a_i7_pntr = XA + ldXA * amap[ 0 ];
-  //}
-  //else {
-  //  a_i0_pntr = XA + ldXA * amap[ 0 ];
-  //  a_i1_pntr = XA + ldXA * amap[ 0 ];
-  //  a_i2_pntr = XA + ldXA * amap[ 0 ];
-  //  a_i3_pntr = XA + ldXA * amap[ 0 ];
-  //  a_i4_pntr = XA + ldXA * amap[ 0 ];
-  //  a_i5_pntr = XA + ldXA * amap[ 0 ];
-  //  a_i6_pntr = XA + ldXA * amap[ 0 ];
-  //  a_i7_pntr = XA + ldXA * amap[ 0 ];
-  //}
-
-
-  // loop over rows of XB
   for ( p = 0; p < k; p ++ ) {
-    //*packA ++ = *a_i0_pntr++;
-    //*packA ++ = *a_i1_pntr++;
-    //*packA ++ = *a_i2_pntr++;
-    //*packA ++ = *a_i3_pntr++;
-    //*packA ++ = *a_i4_pntr++;
-    //*packA ++ = *a_i5_pntr++;
-    //*packA ++ = *a_i6_pntr++;
-    //*packA ++ = *a_i7_pntr++;
-
-    // No loop unrolling
     for ( i = 0; i < DKS_MR; i ++ ) {
       *packA ++ = *a_pntr[ i ] ++;
     }
   }
+
+  /*
+  double *a_i0_pntr;
+  double *a_i1_pntr;
+  double *a_i2_pntr;
+  double *a_i3_pntr;
+  double *a_i4_pntr;
+  double *a_i5_pntr;
+  double *a_i6_pntr;
+  double *a_i7_pntr;
+
+  if ( m > 7 ) {
+    a_i0_pntr = XA + ldXA * amap[ 0 ];
+    a_i1_pntr = XA + ldXA * amap[ 1 ];
+    a_i2_pntr = XA + ldXA * amap[ 2 ];
+    a_i3_pntr = XA + ldXA * amap[ 3 ];
+    a_i4_pntr = XA + ldXA * amap[ 4 ];
+    a_i5_pntr = XA + ldXA * amap[ 5 ];
+    a_i6_pntr = XA + ldXA * amap[ 6 ];
+    a_i7_pntr = XA + ldXA * amap[ 7 ];
+  }
+  else if ( m > 6 ) {
+    a_i0_pntr = XA + ldXA * amap[ 0 ];
+    a_i1_pntr = XA + ldXA * amap[ 1 ];
+    a_i2_pntr = XA + ldXA * amap[ 2 ];
+    a_i3_pntr = XA + ldXA * amap[ 3 ];
+    a_i4_pntr = XA + ldXA * amap[ 4 ];
+    a_i5_pntr = XA + ldXA * amap[ 5 ];
+    a_i6_pntr = XA + ldXA * amap[ 6 ];
+    a_i7_pntr = XA + ldXA * amap[ 0 ];
+  }
+  else if ( m > 5 ) {
+    a_i0_pntr = XA + ldXA * amap[ 0 ];
+    a_i1_pntr = XA + ldXA * amap[ 1 ];
+    a_i2_pntr = XA + ldXA * amap[ 2 ];
+    a_i3_pntr = XA + ldXA * amap[ 3 ];
+    a_i4_pntr = XA + ldXA * amap[ 4 ];
+    a_i5_pntr = XA + ldXA * amap[ 5 ];
+    a_i6_pntr = XA + ldXA * amap[ 0 ];
+    a_i7_pntr = XA + ldXA * amap[ 0 ];
+  }
+  else if ( m > 4 ) {
+    a_i0_pntr = XA + ldXA * amap[ 0 ];
+    a_i1_pntr = XA + ldXA * amap[ 1 ];
+    a_i2_pntr = XA + ldXA * amap[ 2 ];
+    a_i3_pntr = XA + ldXA * amap[ 3 ];
+    a_i4_pntr = XA + ldXA * amap[ 4 ];
+    a_i5_pntr = XA + ldXA * amap[ 0 ];
+    a_i6_pntr = XA + ldXA * amap[ 0 ];
+    a_i7_pntr = XA + ldXA * amap[ 0 ];
+  }
+  else if ( m > 3 ) {
+    a_i0_pntr = XA + ldXA * amap[ 0 ];
+    a_i1_pntr = XA + ldXA * amap[ 1 ];
+    a_i2_pntr = XA + ldXA * amap[ 2 ];
+    a_i3_pntr = XA + ldXA * amap[ 3 ];
+    a_i4_pntr = XA + ldXA * amap[ 0 ];
+    a_i5_pntr = XA + ldXA * amap[ 0 ];
+    a_i6_pntr = XA + ldXA * amap[ 0 ];
+    a_i7_pntr = XA + ldXA * amap[ 0 ];
+  }
+  else if ( m > 2 ) {
+    a_i0_pntr = XA + ldXA * amap[ 0 ];
+    a_i1_pntr = XA + ldXA * amap[ 1 ];
+    a_i2_pntr = XA + ldXA * amap[ 2 ];
+    a_i3_pntr = XA + ldXA * amap[ 0 ];
+    a_i4_pntr = XA + ldXA * amap[ 0 ];
+    a_i5_pntr = XA + ldXA * amap[ 0 ];
+    a_i6_pntr = XA + ldXA * amap[ 0 ];
+    a_i7_pntr = XA + ldXA * amap[ 0 ];
+  }
+  else if ( m > 1 ) {
+    a_i0_pntr = XA + ldXA * amap[ 0 ];
+    a_i1_pntr = XA + ldXA * amap[ 1 ];
+    a_i2_pntr = XA + ldXA * amap[ 0 ];
+    a_i3_pntr = XA + ldXA * amap[ 0 ];
+    a_i4_pntr = XA + ldXA * amap[ 0 ];
+    a_i5_pntr = XA + ldXA * amap[ 0 ];
+    a_i6_pntr = XA + ldXA * amap[ 0 ];
+    a_i7_pntr = XA + ldXA * amap[ 0 ];
+  }
+  else {
+    a_i0_pntr = XA + ldXA * amap[ 0 ];
+    a_i1_pntr = XA + ldXA * amap[ 0 ];
+    a_i2_pntr = XA + ldXA * amap[ 0 ];
+    a_i3_pntr = XA + ldXA * amap[ 0 ];
+    a_i4_pntr = XA + ldXA * amap[ 0 ];
+    a_i5_pntr = XA + ldXA * amap[ 0 ];
+    a_i6_pntr = XA + ldXA * amap[ 0 ];
+    a_i7_pntr = XA + ldXA * amap[ 0 ];
+  }
+
+  for ( p = 0; p < k; p ++ ) {
+    *packA ++ = *a_i0_pntr++;
+    *packA ++ = *a_i1_pntr++;
+    *packA ++ = *a_i2_pntr++;
+    *packA ++ = *a_i3_pntr++;
+    *packA ++ = *a_i4_pntr++;
+    *packA ++ = *a_i5_pntr++;
+    *packA ++ = *a_i6_pntr++;
+    *packA ++ = *a_i7_pntr++;
+  }
+  */
 }
 
 
@@ -211,13 +208,7 @@ void packB_kcxnc(
     double *packB
     )
 {
-  int    j, p;
-  //double *b_i0_pntr;
-  //double *b_i1_pntr;
-  //double *b_i2_pntr;
-  //double *b_i3_pntr;
-  //double *packB_check = packB;
-
+  int    j, p; 
   double *b_pntr[ DKS_NR ];
 
   for ( j = 0; j < n; j ++ ) {
@@ -228,53 +219,51 @@ void packB_kcxnc(
     b_pntr[ j ] = XB + ldXB * bmap[ 0 ];
   }
 
-
-  //if ( n > 3 ) {
-  //  //printf( "packB n = 4\n" );
-  //  //printf( "ldXB = %d, bmap[ 0 ] = %d, bmap[ 1 ] = %d, bmap[ 2 ] = %d, bmap[ 3 ] = %d\n", 
-  //  //    ldXB, bmap[ 0 ], bmap[ 1 ], bmap[ 2 ], bmap[ 3 ] );
-  //  b_i0_pntr = XB + ldXB * bmap[ 0 ];
-  //  b_i1_pntr = XB + ldXB * bmap[ 1 ];
-  //  b_i2_pntr = XB + ldXB * bmap[ 2 ];
-  //  b_i3_pntr = XB + ldXB * bmap[ 3 ];
-  //}
-  //else if ( n > 2 ) {
-  //  //printf( "packB n = 3\n" );
-  //  b_i0_pntr = XB + ldXB * bmap[ 0 ];
-  //  b_i1_pntr = XB + ldXB * bmap[ 1 ];
-  //  b_i2_pntr = XB + ldXB * bmap[ 2 ];
-  //  b_i3_pntr = XB + ldXB * bmap[ 0 ];
-  //}
-  //else if ( n > 1 ) {
-  //  //printf( "packB n = 2\n" );
-  //  b_i0_pntr = XB + ldXB * bmap[ 0 ];
-  //  b_i1_pntr = XB + ldXB * bmap[ 1 ];
-  //  b_i2_pntr = XB + ldXB * bmap[ 0 ];
-  //  b_i3_pntr = XB + ldXB * bmap[ 0 ];
-  //}
-  //else {
-  //  //printf( "packB n = 1\n" );
-  //  b_i0_pntr = XB + ldXB * bmap[ 0 ];
-  //  b_i1_pntr = XB + ldXB * bmap[ 0 ];
-  //  b_i2_pntr = XB + ldXB * bmap[ 0 ];
-  //  b_i3_pntr = XB + ldXB * bmap[ 0 ];
-  //}
-
-  //printf( "packB loop k = %d\n", k );
-
-  // loop over rows of XB
   for ( p = 0; p < k; p ++ ) {
-    //*packB ++ = *b_i0_pntr++;
-    //*packB ++ = *b_i1_pntr++;
-    //*packB ++ = *b_i2_pntr++;
-    //*packB ++ = *b_i3_pntr++;
-
     for ( j = 0; j < DKS_NR; j ++ ) {
       *packB ++ = *b_pntr[ j ] ++;
     }
   }
 
-  //printf( "packB end\n" );
+
+  /*
+  double *b_i0_pntr;
+  double *b_i1_pntr;
+  double *b_i2_pntr;
+  double *b_i3_pntr;
+
+  if ( n > 3 ) {
+    b_i0_pntr = XB + ldXB * bmap[ 0 ];
+    b_i1_pntr = XB + ldXB * bmap[ 1 ];
+    b_i2_pntr = XB + ldXB * bmap[ 2 ];
+    b_i3_pntr = XB + ldXB * bmap[ 3 ];
+  }
+  else if ( n > 2 ) {
+    b_i0_pntr = XB + ldXB * bmap[ 0 ];
+    b_i1_pntr = XB + ldXB * bmap[ 1 ];
+    b_i2_pntr = XB + ldXB * bmap[ 2 ];
+    b_i3_pntr = XB + ldXB * bmap[ 0 ];
+  }
+  else if ( n > 1 ) {
+    b_i0_pntr = XB + ldXB * bmap[ 0 ];
+    b_i1_pntr = XB + ldXB * bmap[ 1 ];
+    b_i2_pntr = XB + ldXB * bmap[ 0 ];
+    b_i3_pntr = XB + ldXB * bmap[ 0 ];
+  }
+  else {
+    b_i0_pntr = XB + ldXB * bmap[ 0 ];
+    b_i1_pntr = XB + ldXB * bmap[ 0 ];
+    b_i2_pntr = XB + ldXB * bmap[ 0 ];
+    b_i3_pntr = XB + ldXB * bmap[ 0 ];
+  }
+
+  for ( p = 0; p < k; p ++ ) {
+    *packB ++ = *b_i0_pntr++;
+    *packB ++ = *b_i1_pntr++;
+    *packB ++ = *b_i2_pntr++;
+    *packB ++ = *b_i3_pntr++;
+  }
+  */
 }
 
 void packw_rhsxnc(
@@ -293,7 +282,6 @@ void packw_rhsxnc(
     w_pntr[ j ] = w + ldw * wmap[ j ];
   }
 
-  // Loop over rhs of w
   for ( p = 0; p < rhs; p ++ ) {
     for ( j = 0; j < n; j ++ ) {
       *packw ++ = *w_pntr[ j ] ++;
@@ -306,6 +294,31 @@ void packw_rhsxnc(
 }
 
 
+void packu_rhsxmc(
+    int    m,
+    int    rhs,
+    double *u,
+    int    ldu, // ldu should be rhs
+    int    *umap,
+    double *packu
+    )
+{
+  int    i, p;
+  double *u_pntr[ DKS_MR ];
+
+  for ( i = 0; i < m; i ++ ) {
+    u_pntr[ i ] = u + ldu * umap[ i ];
+  }
+
+  for ( p = 0; p < rhs; p ++ ) {
+    for ( i = 0; i < m; i ++ ) {
+      *packu ++ = *u_pntr[ i ] ++;
+    }
+    for ( i = m; i < DKS_MR; i ++ ) {
+      packu ++;
+    }
+  }
+}
 
 
 /* 
@@ -1042,14 +1055,27 @@ void dgsks(
         #pragma omp parallel for num_threads( ks_ic_nt ) private( jr )
         for ( j = 0; j < jb; j += DKS_NR ) {
           // Initialize w
-          for ( jr = 0; jr < DKS_NR; jr ++ ) {
-            packw[ j + jr ] = 0.0;
-          }
+          //for ( jr = 0; jr < DKS_NR; jr ++ ) {
+          //  packw[ j + jr ] = 0.0;
+          //}
+
+          packw_rhsxnc(
+            min( jb - j, DKS_NR ),
+            KS_RHS,
+            w,
+            KS_RHS,
+            &wmap[ jc + j ],
+            &packw[ j * KS_RHS ]
+            );
+
+
+
+
           //printf( "dgsks(): packw & packB2, j = %d, jb = %d\n", j, jb );
           // packw and packB2
           for ( jr = 0; jr < min( jb - j, DKS_NR ); jr ++ ) {
             //printf( "dgsks(): packw & packB2, j = %d, jr = %d\n", j, jr );
-            packw[ j + jr ] = w[ wmap[ jc + j + jr ] ];
+            //packw[ j + jr ] = w[ wmap[ jc + j + jr ] ];
             if ( pack_norm ) {
               packB2[ j + jr ] = XB2[ bmap[ jc + j + jr ] ];
             }
@@ -1084,6 +1110,16 @@ void dgsks(
 
           ib = min( m - ic, DKS_MC );
           for ( i = 0; i < ib; i += DKS_MR ) {
+
+            packu_rhsxmc(
+              min( ib - i, DKS_MR ),
+              KS_RHS,
+              u,
+              KS_RHS,
+              &umap[ ic + i ],
+              &packu[ tid * DKS_MC * KS_RHS + i * KS_RHS ]
+              );
+
             for ( ir = 0; ir < min( ib - i, DKS_MR ); ir ++ ) {
 
               // -----------------------------------------------------------------
@@ -1094,7 +1130,7 @@ void dgsks(
               // -----------------------------------------------------------------
               // Separate ulist ( u has a separate umap )
               // -----------------------------------------------------------------
-              packu[ tid * DKS_MC + i + ir ] = u[ umap[ ic + i + ir ] ];
+              //packu[ tid * DKS_MC + i + ir ] = u[ umap[ ic + i + ir ] ];
               // ----------------------------------------------------------------- 
               if ( pack_norm ) {
                 packA2[ tid * DKS_MC + i + ir ] = XA2[ amap[ ic + i + ir ] ];
