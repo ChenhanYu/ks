@@ -29,31 +29,30 @@
 #include <ks.h>
 
 void compute_error(
-    int    n,
+    int    m,
+    int    rhs,
     double *u_test,
     double *u_gold
     )
 {
-  int    i;
-  int    max_idx;
-  double max_err;
-  double abs_err;
-  double rel_err;
-  double tmp;
-  double nrm2;
+  int    i, p, max_idx;
+  double max_err, abs_err, rel_err;
+  double tmp, nrm2;
 
   max_idx = -1;
   max_err = 0.0;
   nrm2    = 0.0;
 
-  for ( i = 0; i < n; i ++ ) {
-    tmp = fabs( u_test[ i ] - u_gold[ i ] );
-    if ( tmp > max_err ) {
-      max_err = tmp;
-      max_idx = i;
+  for ( p = 0; p < rhs; p ++ ) {
+    for ( i = 0; i < m; i ++ ) {
+      tmp = fabs( u_test[ p * m + i ] - u_gold[ p * m + i ] );
+      if ( tmp > max_err ) {
+        max_err = tmp;
+        max_idx = i;
+      }
+      rel_err += tmp * tmp;
+      nrm2    += u_gold[ p * m + i ] * u_gold[ p * m + i ];
     }
-    rel_err += tmp * tmp;
-    nrm2    += u_gold[ i ] * u_gold[ i ];
   }
 
   abs_err = sqrt( rel_err );
@@ -70,20 +69,17 @@ void test_dgsks(
   int k
     ) 
 {
-  int    i, j, p, nx, iter, n_iter;
+  int    i, j, p, nx, iter, n_iter, rhs;
   int    *amap, *bmap, *wmap, *umap;
   double *XA, *XB, *XA2, *XB2, *u, *w, *h, *umkl;
   double tmp, error, flops;
   double ref_beg, ref_time, dgsks_beg, dgsks_time;
   ks_t   kernel;
 
-  nx = 4096 * 5;
+  nx     = 4096 * 5;
+  rhs    = 1;
   n_iter = 1;
 
-  //m = 4096 + 2;
-  //n = 512 - 1;
-  //k = 256 + 256;
-  
 
   // ------------------------------------------------------------------------
   // Memory allocation for all common buffers
@@ -93,24 +89,22 @@ void test_dgsks(
   bmap = (int*)malloc( sizeof(int) * n );
   wmap = (int*)malloc( sizeof(int) * n );
   XA   = (double*)malloc( sizeof(double) * k * nx );
-  //XA   = (double*)malloc( sizeof(double) * k * m );
-  //XB   = (double*)malloc( sizeof(double) * k * n );
   XA2  = (double*)malloc( sizeof(double) * nx );
-  //XA2  = (double*)malloc( sizeof(double) * m );
-  //XB2  = (double*)malloc( sizeof(double) * n );
-  u    = (double*)malloc( sizeof(double) * nx );
-  w    = (double*)malloc( sizeof(double) * nx );
-  umkl = (double*)malloc( sizeof(double) * nx );
+  u    = (double*)malloc( sizeof(double) * nx * rhs );
+  w    = (double*)malloc( sizeof(double) * nx * rhs );
+  umkl = (double*)malloc( sizeof(double) * nx * rhs );
   // ------------------------------------------------------------------------
 
 
   // ------------------------------------------------------------------------
   // Initialization
   // ------------------------------------------------------------------------
-  for ( i = 0; i < nx; i ++ ) {
-    u[ i ] = 0.0;
-    umkl[ i ] = 0.0;
-    w[ i ] = 1.0;
+  for ( p = 0; p < rhs; p ++ ) {
+    for ( i = 0; i < nx; i ++ ) {
+      u[ p * nx + i ]    = 0.0;
+      umkl[ p * nx + i ] = 0.0;
+      w[ p * nx + i ]    = (double)( rand() % 1000 ) / 1000.0;
+    }
   }
 
   for ( i = 0; i < m; i ++ ) {
@@ -188,8 +182,8 @@ void test_dgsks(
   // ------------------------------------------------------------------------
   // Test Gaussian Kernel
   // ------------------------------------------------------------------------
-  //kernel.type = KS_GAUSSIAN;
-  //kernel.scal = -0.5;
+  kernel.type = KS_GAUSSIAN;
+  kernel.scal = -0.5;
   //kernel.scal = -1.0 * 0.16 * 0.16;
   //kernel.scal = -5000.0;
   // ------------------------------------------------------------------------
@@ -210,10 +204,10 @@ void test_dgsks(
   // ------------------------------------------------------------------------
   // Test Polynomial Kernel
   // ------------------------------------------------------------------------
-  kernel.type = KS_POLYNOMIAL;
-  kernel.powe = 4.0;
-  kernel.scal = 0.1;
-  kernel.cons = 0.1;
+  //kernel.type = KS_POLYNOMIAL;
+  //kernel.powe = 4.0;
+  //kernel.scal = 0.1;
+  //kernel.cons = 0.1;
   // ------------------------------------------------------------------------
 
 
@@ -360,7 +354,7 @@ void test_dgsks(
   //  error += tmp * tmp;
   //}
 
-  compute_error( m, u, umkl );
+  compute_error( m, rhs, u, umkl );
 
   //printf( "%lf, %lf\n", umkl[ 0 ], u[ 0 ] );
 
