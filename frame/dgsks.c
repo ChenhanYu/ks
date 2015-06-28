@@ -62,7 +62,7 @@
  *         into a Z shape contiguous buffer.
  * --------------------------------------------------------------------------
  */
-void packA_kcxmc(
+inline void packA_kcxmc(
     int    m,
     int    k,
     double *XA,
@@ -199,7 +199,7 @@ void packA_kcxmc(
  *         into a Z shape contiguous buffer.
  * --------------------------------------------------------------------------
  */
-void packB_kcxnc(
+inline void packB_kcxnc(
     int    n,
     int    k,
     double *XB,
@@ -266,7 +266,7 @@ void packB_kcxnc(
   */
 }
 
-void packw_rhsxnc(
+inline void packw_rhsxnc(
     int    n,
     int    rhs,
     double *w,
@@ -294,7 +294,7 @@ void packw_rhsxnc(
 }
 
 
-void packu_rhsxmc(
+inline void packu_rhsxmc(
     int    m,
     int    rhs,
     double *u,
@@ -319,6 +319,34 @@ void packu_rhsxmc(
     }
   }
 }
+
+inline void unpacku_rhsxmc(
+    int    m,
+    int    rhs,
+    double *u,
+    int    ldu, // ldu should be rhs
+    int    *umap,
+    double *packu
+    )
+{
+  int    i, p;
+  double *u_pntr[ DKS_MR ];
+
+  for ( i = 0; i < m; i ++ ) {
+    u_pntr[ i ] = u + ldu * umap[ i ];
+  }
+
+  for ( p = 0; p < rhs; p ++ ) {
+    for ( i = 0; i < m; i ++ ) {
+      *u_pntr[ i ] ++ = *packu ++;
+    }
+    for ( i = m; i < DKS_MR; i ++ ) {
+      packu ++;
+    }
+  }
+}
+
+
 
 
 /* 
@@ -1111,6 +1139,7 @@ void dgsks(
           ib = min( m - ic, DKS_MC );
           for ( i = 0; i < ib; i += DKS_MR ) {
 
+            // packu with multiple rhs.
             packu_rhsxmc(
               min( ib - i, DKS_MR ),
               KS_RHS,
@@ -1170,7 +1199,19 @@ void dgsks(
               );
 
           for ( i = 0; i < ib; i += DKS_MR ) {
-            for ( ir = 0; ir < min( ib - i, DKS_MR ); ir ++ ) {
+
+            // unpacku with multiple rhs.
+            unpacku_rhsxmc(
+              min( ib - i, DKS_MR ),
+              KS_RHS,
+              u,
+              KS_RHS,
+              &umap[ ic + i ],
+              &packu[ tid * DKS_MC * KS_RHS + i * KS_RHS ]
+              );
+
+
+            //for ( ir = 0; ir < min( ib - i, DKS_MR ); ir ++ ) {
               // -----------------------------------------------------------------
               // Unified ulist ( u and A share amap ) 
               // ----------------------------------------------------------------- 
@@ -1179,9 +1220,9 @@ void dgsks(
               // -----------------------------------------------------------------
               // Separate ulist ( u has a separate umap )
               // -----------------------------------------------------------------
-              u[ umap[ ic + i + ir ] ] = packu[ tid * DKS_MC + i + ir ];
+              //u[ umap[ ic + i + ir ] ] = packu[ tid * DKS_MC + i + ir ];
               // -----------------------------------------------------------------
-            }
+            //}
           }
         }
       }
