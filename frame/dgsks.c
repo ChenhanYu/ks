@@ -266,6 +266,7 @@ inline void packB_kcxnc(
   */
 }
 
+
 inline void packw_rhsxnc(
     int    n,
     int    rhs,
@@ -319,6 +320,7 @@ inline void packu_rhsxmc(
     }
   }
 }
+
 
 inline void unpacku_rhsxmc(
     int    m,

@@ -43,15 +43,15 @@ void compute_error(
   max_err = 0.0;
   nrm2    = 0.0;
 
-  for ( p = 0; p < rhs; p ++ ) {
-    for ( i = 0; i < m; i ++ ) {
-      tmp = fabs( u_test[ p * m + i ] - u_gold[ p * m + i ] );
+  for ( i = 0; i < m; i ++ ) {
+    for ( p = 0; p < rhs; p ++ ) {
+      tmp = fabs( u_test[ i * rhs + p ] - u_gold[ i * rhs + p ] );
       if ( tmp > max_err ) {
         max_err = tmp;
         max_idx = i;
       }
       rel_err += tmp * tmp;
-      nrm2    += u_gold[ p * m + i ] * u_gold[ p * m + i ];
+      nrm2    += u_gold[ i * rhs + p ] * u_gold[ i * rhs + p ];
     }
   }
 
@@ -99,11 +99,11 @@ void test_dgsks(
   // ------------------------------------------------------------------------
   // Initialization
   // ------------------------------------------------------------------------
-  for ( p = 0; p < rhs; p ++ ) {
-    for ( i = 0; i < nx; i ++ ) {
-      u[ p * nx + i ]    = 0.0;
-      umkl[ p * nx + i ] = 0.0;
-      w[ p * nx + i ]    = (double)( rand() % 1000 ) / 1000.0;
+  for ( i = 0; i < nx; i ++ ) {
+    for ( p = 0; p < rhs; p ++ ) {
+      u[ i * rhs + p ]    = 0.0;
+      umkl[ i * rhs + p ] = 0.0;
+      w[ i * rhs + p ]    = (double)( rand() % 1000 ) / 1000.0;
     }
   }
 
