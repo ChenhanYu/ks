@@ -12,15 +12,10 @@ KERNEL_SRC=       \
 								  micro_kernel/x86_64/sandybridge/ks_gaussian_int_d8x4.c \
 								  micro_kernel/x86_64/sandybridge/ks_gaussian_svml_d8x4.c \
 								  \
-								  micro_kernel/x86_64/sandybridge/ks_gaussian_int_d8x4_var2.c \
-								  micro_kernel/x86_64/sandybridge/ks_gaussian_asm_d8x4_var2.c \
-								  micro_kernel/x86_64/sandybridge/ks_gaussian_svml_d8x4_var2.c \
-								  \
 								  micro_kernel/x86_64/sandybridge/ks_variable_bandwidth_gaussian_int_d8x4.c \
 								  \
-								  micro_kernel/x86_64/sandybridge/ks_variable_bandwidth_gaussian_asm_d8x4_var2.c \
-								  \
 								  micro_kernel/x86_64/sandybridge/ks_polynomial_int_d8x4.c \
+									\
 								  micro_kernel/x86_64/sandybridge/ks_laplace3d_int_d8x4.c \
 								  \
 								  micro_kernel/x86_64/sandybridge/ks_tanh_int_d8x4.c \
@@ -33,7 +28,6 @@ KERNEL_SRC=       \
 									\
 								  micro_kernel/x86_64/sandybridge/ks_rank_k_int_d8x4.c \
 								  micro_kernel/x86_64/sandybridge/ks_rank_k_asm_d8x4.c \
-								  micro_kernel/x86_64/sandybridge/ks_rank_k_int_d8x4_unroll_4.c \
 								  \
 								  micro_kernel/x86_64/sandybridge/exp_int_d4.c \
 								  micro_kernel/x86_64/sandybridge/pow_int_d4.c \

@@ -69,9 +69,9 @@
 
 void ks_rank_k_asm_d8x4(
     int    k,
-    double* a,
-    double* b,
-    double* c,
+    double *a,
+    double *b,
+    double *c,
     int    ldc,
     aux_t  *aux
     )

@@ -40,6 +40,27 @@ void ks_tanh_int_d8x4(
   #include "ks_rank_k_int_d8x4.h"
 
 
+  // Accumulate
+  if ( aux->pc ) {
+    tmpc03_0.v = _mm256_load_pd( (double*)( c      ) );
+    c03_0.v    = _mm256_add_pd( tmpc03_0.v, c03_0.v );
+    tmpc47_0.v = _mm256_load_pd( (double*)( c + 4  ) );
+    c47_0.v    = _mm256_add_pd( tmpc47_0.v, c47_0.v );
+    tmpc03_1.v = _mm256_load_pd( (double*)( c + 8  ) );
+    c03_1.v    = _mm256_add_pd( tmpc03_1.v, c03_1.v );
+    tmpc47_1.v = _mm256_load_pd( (double*)( c + 12 ) );
+    c47_1.v    = _mm256_add_pd( tmpc47_1.v, c47_1.v );
+    tmpc03_2.v = _mm256_load_pd( (double*)( c + 16 ) );
+    c03_2.v    = _mm256_add_pd( tmpc03_2.v, c03_2.v );
+    tmpc47_2.v = _mm256_load_pd( (double*)( c + 20 ) );
+    c47_2.v    = _mm256_add_pd( tmpc47_2.v, c47_2.v );
+    tmpc03_3.v = _mm256_load_pd( (double*)( c + 24 ) );
+    c03_3.v    = _mm256_add_pd( tmpc03_3.v, c03_3.v );
+    tmpc47_3.v = _mm256_load_pd( (double*)( c + 28 ) );
+    c47_3.v    = _mm256_add_pd( tmpc47_3.v, c47_3.v );
+  }
+
+
   // Prefetch u
   __asm__ volatile( "prefetcht0 0(%0)    \n\t" : :"r"( u ) );
 

@@ -390,7 +390,7 @@ void rank_k_macro_kernel(
   int    i, j, j_next;
   aux_t  aux;
 
-  aux.pc = pc;
+  aux.pc     = pc;
   aux.b_next = packB;
 
   for ( j = 0; j < n; j += DKS_NR ) {
@@ -402,7 +402,6 @@ void rank_k_macro_kernel(
 
       //ks_rank_k_int_d8x4(
       ks_rank_k_asm_d8x4(
-      //ks_rank_k_int_d8x4_unroll_4(
           k,
           &packA[ i * k ],
           &packB[ j * k ],
@@ -440,7 +439,7 @@ void rank_k_macro_kernel(
  *                 load the packC if this is the first call.
  * --------------------------------------------------------------------------
  */
-void dgsks_macro_kernel_var2(
+void dgsks_macro_kernel(
     ks_t   *kernel,
     int    m,
     int    n,
@@ -460,125 +459,7 @@ void dgsks_macro_kernel_var2(
   int    i, j, j_next, tid;
   aux_t  aux;
 
-  aux.pc = pc;
-  aux.b_next = packB;
-
-  // We need to access private packh[ tid ]
-  tid = omp_get_thread_num();
-
-  switch ( kernel->type ) {
-    case KS_GAUSSIAN:
-      for ( j = 0; j < n; j += DKS_NR ) {
-        j_next = j + DKS_NR;
-        for ( i = 0; i < m; i += DKS_MR ) {
-          if ( i + DKS_MR >= m ) {
-            aux.b_next += DKS_NR * k;
-          }
-
-          ks_gaussian_asm_d8x4_var2(
-          //ks_gaussian_svml_d8x4_var2(
-              k,
-              kernel->scal,
-              packu + i,
-              packA2 + i,
-              &packA[ i * k ],
-              packB2 + j,
-              &packB[ j * k ],
-              packw + j,
-              &packC[ j * ldc + i * DKS_NR ], // packed
-              //&packC[ j * ldc + i ],        // nonpacked
-              ldc,
-              &aux
-              );
-        }
-      }
-      break;
-    case KS_GAUSSIAN_VAR_BANDWIDTH:
-      for ( j = 0; j < n; j += DKS_NR ) {
-        j_next = j + DKS_NR;
-        for ( i = 0; i < m; i += DKS_MR ) {
-          if ( i + DKS_MR >= m ) {
-            aux.b_next += DKS_NR * k;
-          }
-
-          ks_variable_bandwidth_gaussian_asm_d8x4_var2(
-              k,
-              //kernel->packh + j,
-              packh + j,
-              packu + i,
-              packA2 + i,
-              &packA[ i * k ],
-              packB2 + j,
-              &packB[ j * k ],
-              packw + j,
-              &packC[ j * ldc + i * DKS_NR ],
-              ldc,
-              &aux
-              );
-        }
-      }
-      break;
-    case KS_POLYNOMIAL:
-      printf( "Error dgsks_macro_kernel_var2(): polynomial kernel hasn't been implemented.\n" );
-      break;
-    case KS_LAPLACE:
-      printf( "Error dgsks_macro_kernel_var2(): laplace kernel hasn't been implemented.\n" );
-      break;
-    case KS_TANH:
-      printf( "Error dgsks_macro_kernel_var2(): tanh kernel hasn't been implemented.\n" );
-      break;
-    case KS_QUARTIC:
-      printf( "Error dgsks_macro_kernel_var2(): quartic kernel hasn't been implemented.\n" );
-      break;
-    case KS_MULTIQUADRATIC:
-      printf( "Error dgsks_macro_kernel_var2(): multiquadratic kernel hasn't been implemented.\n" );
-      break;
-    case KS_EPANECHNIKOV:
-      printf( "Error dgsks_macro_kernel_var2(): epanechnikov kernel hasn't been implemented.\n" );
-      break;
-    default:
-      printf( "Error dgsks_macro_kernel_var2(): illegal kernel type\n" );
-      exit( 1 );
-  }
-}
-
-
-/* 
- * --------------------------------------------------------------------------
- * @brief  This is macro-kernel will be called if k <= KC. The macro-kernel
- *         includes the 3.rd and the 2.nd loop, calling a mr x nr 
- *         micro-kernel.
- *
- * @param  *kernel This structure is used to specified the type of the kernel.
- * @param  m       Number of target points
- * @param  n       Number of source points
- * @param  k       Data point dimension
- * @param  *packu  Packed potential vector, packu = u[ umap[] ];
- * @param  *packA  Packed target coordinates
- * @param  *packA2 Packed target square 2-norm
- * @param  *packB  Packed source coordinates
- * @param  *packB2 Packed source square 2-norm
- * @param  *packw  Packed weight vector, packw = w[ wmap[] ];
- * --------------------------------------------------------------------------
- */
-void dgsks_macro_kernel(
-    ks_t   *kernel,
-    int    m,
-    int    n,
-    int    k,
-    double *packu,
-    double *packA,
-    double *packA2,
-    double *packB,
-    double *packB2,
-    double *packw,
-    double *packh
-    )
-{
-  int    i, j, j_next;
-  double *c, *h;
-  aux_t  aux;
-
+  aux.pc     = pc;
   aux.b_next = packB;
 
   for ( j = 0; j < n; j += DKS_NR ) {
@@ -590,20 +471,21 @@ void dgsks_macro_kernel(
       ( *micro[ kernel->type ] )(
           k,
           KS_RHS,
-          packh + j,
-          &packu[ i ],
-          &packA2[ i ],
-          &packA[ i * k ],
-          &packB2[ j ],
-          &packB[ j * k ],
-          &packw[ j ],
-          NULL,
+          packh  + j,
+          packu  + i ,
+          packA2 + i ,
+          packA  + i * k ,
+          packB2 + j ,
+          packB  + j * k ,
+          packw  + j,
+          packC  + j * ldc + i * DKS_NR, // packed
           kernel,
           &aux
           );
     }
   }
 }
+
 
 
 /* 
@@ -692,7 +574,6 @@ void dgsks(
       }
       pack_bandwidth = 1;
       pack_norm      = 1;
-      //kernel->packh = ks_malloc_aligned( 1, ( DKS_NC + 1 ), sizeof(double) ); 
       packh          = ks_malloc_aligned( 1, ( DKS_NC + 1 ), sizeof(double) ); 
       break;
     case KS_POLYNOMIAL:
@@ -755,22 +636,22 @@ void dgsks(
           
           if ( pc + DKS_KC >= k ) {
             // Initialize w
-            //for ( jr = 0; jr < DKS_NR; jr ++ ) {
-            //  packw[ j + jr ] = 0.0;
-            //}
+            for ( jr = 0; jr < DKS_NR; jr ++ ) {
+              packw[ j + jr ] = 0.0;
+            }
 
-            packw_rhsxnc(
-              min( jb - j, DKS_NR ),
-              KS_RHS,
-              w,
-              KS_RHS,
-              &wmap[ jc + j + jr ],
-              &packw[ j * KS_RHS ]
-              );
+            //packw_rhsxnc(
+            //  min( jb - j, DKS_NR ),
+            //  KS_RHS,
+            //  w,
+            //  KS_RHS,
+            //  &wmap[ jc + j + jr ],
+            //  &packw[ j * KS_RHS ]
+            //  );
 
             // packw, packB2, packh (alternatively)
             for ( jr = 0; jr < min( jb - j, DKS_NR ); jr ++ ) {
-              //packw[ j + jr ] = w[ wmap[ jc + j + jr ] ];
+              packw[ j + jr ] = w[ wmap[ jc + j + jr ] ];
               if ( pack_norm ) {
                 packB2[ j + jr ] = XB2[ bmap[ jc + j + jr ] ];
               }
@@ -865,26 +746,20 @@ void dgsks(
           else {
 
             /* call the macro kernel */
-            dgsks_macro_kernel_var2(                      // 1~3 loops
+            dgsks_macro_kernel(                      // 1~3 loops
                 kernel,
                 ib,
                 jb,
                 pb,
-                packu + tid * DKS_MC,
-                //packu,
-                packA + tid * DKS_MC * pb,
-                //packA + tid * DKS_MC * DKS_KC,
-                //packA,
+                packu  + tid * DKS_MC,
+                packA  + tid * DKS_MC * pb,
                 packA2 + tid * DKS_MC,
-                //packA2,
                 packB,
                 packB2,
                 packw,
                 packh,
-                &packC[ ic * padn ],                // packed
-                //&packC[ ic ],                       // nonpacked
+                packC  + ic * padn,                   // packed
                 ( ( ib - 1 ) / DKS_MR + 1 ) * DKS_MR, // packed
-                //ldc,                                // nonpacked
                 pc
                 );
 
@@ -895,18 +770,19 @@ void dgsks(
             //    );
 
             /* Unpack u */
-            for ( i = 0; i < ib; i += DKS_MR ) {
-              for ( ir = 0; ir < min( ib - i, DKS_MR ); ir ++ ) {
-                // -----------------------------------------------------------------
-                // Unified ulist ( u and A share amap ) 
-                // ----------------------------------------------------------------- 
-                //u[ amap[ ic + i + ir ] ] = packu[ tid * DKS_MC + i + ir ];
-                //u[ amap[ ic + i + ir ] ] = packu[ i + ir ];
-                // -----------------------------------------------------------------
-                // Separate ulist ( u has a separate umap )
-                // -----------------------------------------------------------------
-                u[ umap[ ic + i + ir ] ] = packu[ tid * DKS_MC + i + ir ];
-                // -----------------------------------------------------------------
+            if ( pc + DKS_KC >= k ) {
+              for ( i = 0; i < ib; i += DKS_MR ) {
+                for ( ir = 0; ir < min( ib - i, DKS_MR ); ir ++ ) {
+                  // -----------------------------------------------------------------
+                  // Unified ulist ( u and A share amap ) 
+                  // ----------------------------------------------------------------- 
+                  //u[ amap[ ic + i + ir ] ] = packu[ tid * DKS_MC + i + ir ];
+                  // -----------------------------------------------------------------
+                  // Separate ulist ( u has a separate umap )
+                  // -----------------------------------------------------------------
+                  u[ umap[ ic + i + ir ] ] = packu[ tid * DKS_MC + i + ir ];
+                  // -----------------------------------------------------------------
+                }
               }
             }
           }
@@ -1031,17 +907,16 @@ void dgsks(
               ib,
               jb,
               pb,
-              //packu,
-              packu + tid * DKS_MC,
-              //packA,
-              packA + tid * DKS_MC * pb,
-              //packA + tid * DKS_MC * DKS_KC,
-              //packA2,
+              packu  + tid * DKS_MC,
+              packA  + tid * DKS_MC * pb,
               packA2 + tid * DKS_MC,
               packB,
               packB2,
               packw,
-              packh
+              packh,
+              NULL,
+              0,
+              pc
               );
 
           for ( i = 0; i < ib; i += DKS_MR ) {

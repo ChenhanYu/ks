@@ -424,13 +424,13 @@ int main( int argc, char *argv[] )
 
   //printf( "Test Dgsks: m = %d, n = %d, k = %d\n", m, n, k );
 
-  printf( "KS_GAUSSIAN              : %d\n", KS_GAUSSIAN );
-  printf( "KS_POLYNOMIAL            : %d\n", KS_POLYNOMIAL );
-  printf( "KS_LAPLACE               : %d\n", KS_LAPLACE );
-  printf( "KS_GAUSSIAN_VAR_BANDWIDTH: %d\n", KS_GAUSSIAN_VAR_BANDWIDTH );
-  printf( "KS_TANH                  : %d\n", KS_TANH );
-  printf( "KS_QUARTIC               : %d\n", KS_QUARTIC );
-  printf( "KS_MULTIQUADRATIC        : %d\n", KS_MULTIQUADRATIC );
+  //printf( "KS_GAUSSIAN              : %d\n", KS_GAUSSIAN );
+  //printf( "KS_POLYNOMIAL            : %d\n", KS_POLYNOMIAL );
+  //printf( "KS_LAPLACE               : %d\n", KS_LAPLACE );
+  //printf( "KS_GAUSSIAN_VAR_BANDWIDTH: %d\n", KS_GAUSSIAN_VAR_BANDWIDTH );
+  //printf( "KS_TANH                  : %d\n", KS_TANH );
+  //printf( "KS_QUARTIC               : %d\n", KS_QUARTIC );
+  //printf( "KS_MULTIQUADRATIC        : %d\n", KS_MULTIQUADRATIC );
 
   test_dgsks( m, n, k );
 
