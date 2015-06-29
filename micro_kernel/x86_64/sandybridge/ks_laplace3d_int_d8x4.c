@@ -3,22 +3,28 @@
 
 void ks_laplace3d_int_d8x4(
     int    k,
-    double powe,
-    double scal,
+    int    rhs,
+    double *h,
     double *u,
     double *aa,
     double *a,
     double *bb,
     double *b,
     double *w,
+    double *c,
+    ks_t   *ker,
     aux_t  *aux
     )
 {
   int    i;
   double dzero = 0.0;
-  double dmin   = 1E-15;
+  double dmin  = 1E-15;
   double dmax  = 1.79E+308;
-  double neg2 = -2.0;
+  double neg2  = -2.0;
+  double powe  = ker->powe;
+  double scal  = ker->scal;
+
+
   v4df_t c03_0, c03_1, c03_2, c03_3;
   v4df_t c47_0, c47_1, c47_2, c47_3;
   v4df_t tmpc03_0, tmpc03_1, tmpc03_2, tmpc03_3;

@@ -4,13 +4,16 @@
 
 void ks_multiquadratic_int_d8x4(
     int    k,
-    double cons,
+    int    rhs,
+    double *h,
     double *u,
     double *aa,
     double *a,
     double *bb,
     double *b,
     double *w,
+    double *c,
+    ks_t   *ker,
     aux_t  *aux
     )
 {
@@ -20,6 +23,7 @@ void ks_multiquadratic_int_d8x4(
   double done  =  1.0;
   double mdone = -1.0;
   double alpha = ( 3.0 / 4.0 );
+  double cons  = ker->cons;
 
   v4df_t c03_0, c03_1, c03_2, c03_3;
   v4df_t c47_0, c47_1, c47_2, c47_3;

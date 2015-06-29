@@ -53,11 +53,12 @@
  * */
 
 #include <ks.h>
-#define min( i, j ) ( (i)<(j) ? (i): (j) )
 
 // Global kernel table.
 #include <ks_kernel.h>
 
+
+#define min( i, j ) ( (i)<(j) ? (i): (j) )
 
 
 
@@ -574,203 +575,33 @@ void dgsks_macro_kernel(
     double *packh
     )
 {
-  int    i, j, j_next, tid;
+  int    i, j, j_next;
   double *c, *h;
   aux_t  aux;
 
   aux.b_next = packB;
 
-  tid = omp_get_thread_num();
-
-  switch ( kernel->type ) {
-    case KS_GAUSSIAN:
-      for ( j = 0; j < n; j += DKS_NR ) {
-        j_next = j + DKS_NR;
-        for ( i = 0; i < m; i += DKS_MR ) {
-          if ( i + DKS_MR >= m ) {
-            aux.b_next += DKS_NR * k;
-          }
-          //ks_gaussian_int_d8x4(
-          //ks_gaussian_svml_d8x4(
-          ( *micro[ 0 ] )(
-              k,
-              KS_RHS,
-              packh + j,
-              &packu[ i ],
-              &packA2[ i ],
-              &packA[ i * k ],
-              &packB2[ j ],
-              &packB[ j * k ],
-              &packw[ j ],
-              NULL,
-              kernel,
-              &aux
-              );
-        }
+  for ( j = 0; j < n; j += DKS_NR ) {
+    j_next = j + DKS_NR;
+    for ( i = 0; i < m; i += DKS_MR ) {
+      if ( i + DKS_MR >= m ) {
+        aux.b_next += DKS_NR * k;
       }
-      break;
-    case KS_GAUSSIAN_VAR_BANDWIDTH:
-      for ( j = 0; j < n; j += DKS_NR ) {
-        j_next = j + DKS_NR;
-        for ( i = 0; i < m; i += DKS_MR ) {
-          if ( i + DKS_MR >= m ) {
-            aux.b_next += DKS_NR * k;
-          }
-          ks_variable_bandwidth_gaussian_int_d8x4(
-              k,
-              KS_RHS,
-              packh + j,
-              packu + i,
-              packA2 + i,
-              &packA[ i * k ],
-              packB2 + j,
-              &packB[ j * k ],
-              packw + j,
-              NULL,
-              kernel,
-              &aux
-              );
-        }
-      }
-      break;
-    case KS_POLYNOMIAL:
-      //printf( "Error dgsks_macro_kernel(): polynomial kernel hasn't been implemented.\n" );
-      for ( j = 0; j < n; j += DKS_NR ) {
-        j_next = j + DKS_NR;
-        for ( i = 0; i < m; i += DKS_MR ) {
-          if ( i + DKS_MR >= m ) {
-            aux.b_next += DKS_NR * k;
-          }
-
-          //ks_polynomial_int_d8x4(
-          ( *micro[ 1 ] )(
-              k,
-              KS_RHS,
-              packh + j,
-              &packu[ i ],
-              &packA2[ i ],
-              &packA[ i * k ],
-              &packB2[ j ],
-              &packB[ j * k ],
-              &packw[ j ],
-              NULL,
-              kernel,
-              &aux
-              );
-        }
-      }
-      break;
-    case KS_LAPLACE:
-      //printf( "Error dgsks_macro_kernel(): laplace kernel hasn't been implemented.\n" );
-      for ( j = 0; j < n; j += DKS_NR ) {
-        j_next = j + DKS_NR;
-        for ( i = 0; i < m; i += DKS_MR ) {
-          if ( i + DKS_MR >= m ) {
-            aux.b_next += DKS_NR * k;
-          }
-          ks_laplace3d_int_d8x4(
-              k,
-              kernel->powe,
-              kernel->scal,
-              packu + i,
-              packA2 + i,
-              &packA[ i * k ],
-              packB2 + j,
-              &packB[ j * k ],
-              packw + j,
-              &aux
-              );
-        }
-      }
-      break;
-    case KS_TANH:
-      //printf( "tanh micro-kernel\n" );
-      for ( j = 0; j < n; j += DKS_NR ) {
-        j_next = j + DKS_NR;
-        for ( i = 0; i < m; i += DKS_MR ) {
-          if ( i + DKS_MR >= m ) {
-            aux.b_next += DKS_NR * k;
-          }
-          ks_tanh_int_d8x4(
-              k,
-              kernel->scal,
-              kernel->cons,
-              packu + i,
-              &packA[ i * k ],
-              &packB[ j * k ],
-              packw + j,
-              &aux
-              );
-        }
-      }
-      break;
-    case KS_QUARTIC:
-      //printf( "quartic micro-kernel\n" );
-      for ( j = 0; j < n; j += DKS_NR ) {
-        j_next = j + DKS_NR;
-        for ( i = 0; i < m; i += DKS_MR ) {
-          if ( i + DKS_MR >= m ) {
-            aux.b_next += DKS_NR * k;
-          }
-          ks_quartic_int_d8x4(
-              k,
-              packu + i,
-              packA2 + i,
-              &packA[ i * k ],
-              packB2 + j,
-              &packB[ j * k ],
-              packw + j,
-              &aux
-              );
-        }
-      }
-      break;
-    case KS_MULTIQUADRATIC:
-      //printf( "multiquadratic micro-kernel\n" );
-      for ( j = 0; j < n; j += DKS_NR ) {
-        j_next = j + DKS_NR;
-        for ( i = 0; i < m; i += DKS_MR ) {
-          if ( i + DKS_MR >= m ) {
-            aux.b_next += DKS_NR * k;
-          }
-          ks_multiquadratic_int_d8x4(
-              k,
-              kernel->cons,
-              packu + i,
-              packA2 + i,
-              &packA[ i * k ],
-              packB2 + j,
-              &packB[ j * k ],
-              packw + j,
-              &aux
-              );
-        }
-      }
-      break;
-    case KS_EPANECHNIKOV:
-      //printf( "epanechnikov micro-kernel\n" );
-      for ( j = 0; j < n; j += DKS_NR ) {
-        j_next = j + DKS_NR;
-        for ( i = 0; i < m; i += DKS_MR ) {
-          if ( i + DKS_MR >= m ) {
-            aux.b_next += DKS_NR * k;
-          }
-          ks_epanechnikov_int_d8x4(
-              k,
-              packu + i,
-              packA2 + i,
-              &packA[ i * k ],
-              packB2 + j,
-              &packB[ j * k ],
-              packw + j,
-              &aux
-              );
-        }
-      }
-      break;
-    default:
-      printf( "Error dgsks_macro_kernel(): illegal kernel type\n" );
-      exit( 1 );
+      ( *micro[ kernel->type ] )(
+          k,
+          KS_RHS,
+          packh + j,
+          &packu[ i ],
+          &packA2[ i ],
+          &packA[ i * k ],
+          &packB2[ j ],
+          &packB[ j * k ],
+          &packw[ j ],
+          NULL,
+          kernel,
+          &aux
+          );
+    }
   }
 }
 

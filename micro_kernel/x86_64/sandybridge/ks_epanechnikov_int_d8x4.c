@@ -47,12 +47,16 @@
 
 void ks_epanechnikov_int_d8x4(
     int    k,
+    int    rhs,
+    double *h,   // NOP
     double *u,
     double *aa,
     double *a,
     double *bb,
     double *b,
     double *w,
+    double *c,
+    ks_t   *ker, // NOP
     aux_t  *aux
     )
 {
