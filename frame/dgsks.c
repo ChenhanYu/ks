@@ -570,6 +570,7 @@ void dgsks_macro_kernel(
     )
 {
   int    i, j, j_next, tid;
+  double *c, *h;
   aux_t  aux;
 
   aux.b_next = packB;
@@ -584,17 +585,19 @@ void dgsks_macro_kernel(
           if ( i + DKS_MR >= m ) {
             aux.b_next += DKS_NR * k;
           }
-          //ks_gaussian_int_d8x4(
-          //ks_gaussian_asm_d8x4(
-          ks_gaussian_svml_d8x4(
+          ks_gaussian_int_d8x4(
+          //ks_gaussian_svml_d8x4(
               k,
-              kernel->scal,
-              packu + i,
-              packA2 + i,
+              KS_RHS,
+              NULL,
+              &packu[ i ],
+              &packA2[ i ],
               &packA[ i * k ],
-              packB2 + j,
+              &packB2[ j ],
               &packB[ j * k ],
-              packw + j,
+              &packw[ j ],
+              NULL,
+              kernel,
               &aux
               );
         }
@@ -609,7 +612,7 @@ void dgsks_macro_kernel(
           }
           ks_variable_bandwidth_gaussian_int_d8x4(
               k,
-              //kernel->packh + j,
+              KS_RHS,
               packh + j,
               packu + i,
               packA2 + i,
@@ -617,6 +620,8 @@ void dgsks_macro_kernel(
               packB2 + j,
               &packB[ j * k ],
               packw + j,
+              NULL,
+              kernel,
               &aux
               );
         }
@@ -633,15 +638,16 @@ void dgsks_macro_kernel(
 
           ks_polynomial_int_d8x4(
               k,
-              kernel->powe,
-              kernel->scal,
-              kernel->cons,
-              packu + i,
-              packA2 + i,
+              KS_RHS,
+              NULL,
+              &packu[ i ],
+              &packA2[ i ],
               &packA[ i * k ],
-              packB2 + j,
+              &packB2[ j ],
               &packB[ j * k ],
-              packw + j,
+              &packw[ j ],
+              NULL,
+              kernel,
               &aux
               );
         }

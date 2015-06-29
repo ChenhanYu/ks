@@ -63,6 +63,20 @@ void compute_error(
       rel_err, abs_err, max_err, max_idx );
 }
 
+
+/* 
+ * --------------------------------------------------------------------------
+ * @brief  This is the test routine to exam the correctness of GSKS. XA and
+ *         XB are d leading coordinate tables, and u, w have to be rhs
+ *         leading. In this case, dgsks() doesn't need to know the size of
+ *         nxa and nxb as long as those index map--amap, bmap, umap and wmap
+ *         --are within the legal range.
+ *
+ * @param  m       Number of target points
+ * @param  n       Number of source points
+ * @param  k       Data point dimension
+ * --------------------------------------------------------------------------
+ */
 void test_dgsks(
   int m,
   int n,
@@ -88,11 +102,11 @@ void test_dgsks(
   umap = (int*)malloc( sizeof(int) * m );
   bmap = (int*)malloc( sizeof(int) * n );
   wmap = (int*)malloc( sizeof(int) * n );
-  XA   = (double*)malloc( sizeof(double) * k * nx );
+  XA   = (double*)malloc( sizeof(double) * k * nx );   // k   leading
   XA2  = (double*)malloc( sizeof(double) * nx );
-  u    = (double*)malloc( sizeof(double) * nx * rhs );
-  w    = (double*)malloc( sizeof(double) * nx * rhs );
-  umkl = (double*)malloc( sizeof(double) * nx * rhs );
+  u    = (double*)malloc( sizeof(double) * nx * rhs ); // rhs leading
+  w    = (double*)malloc( sizeof(double) * nx * rhs ); // rhs leading
+  umkl = (double*)malloc( sizeof(double) * nx * rhs ); // rhs leading
   // ------------------------------------------------------------------------
 
 
@@ -182,8 +196,8 @@ void test_dgsks(
   // ------------------------------------------------------------------------
   // Test Gaussian Kernel
   // ------------------------------------------------------------------------
-  kernel.type = KS_GAUSSIAN;
-  kernel.scal = -0.5;
+  //kernel.type = KS_GAUSSIAN;
+  //kernel.scal = -0.5;
   //kernel.scal = -1.0 * 0.16 * 0.16;
   //kernel.scal = -5000.0;
   // ------------------------------------------------------------------------
@@ -204,10 +218,10 @@ void test_dgsks(
   // ------------------------------------------------------------------------
   // Test Polynomial Kernel
   // ------------------------------------------------------------------------
-  //kernel.type = KS_POLYNOMIAL;
-  //kernel.powe = 4.0;
-  //kernel.scal = 0.1;
-  //kernel.cons = 0.1;
+  kernel.type = KS_POLYNOMIAL;
+  kernel.powe = 4.0;
+  kernel.scal = 0.1;
+  kernel.cons = 0.1;
   // ------------------------------------------------------------------------
 
 

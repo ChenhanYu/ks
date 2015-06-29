@@ -11,7 +11,6 @@ FRAME_CPP_SRC=    \
 
 KERNEL_SRC=       \
 								  micro_kernel/x86_64/sandybridge/ks_gaussian_int_d8x4.c \
-								  micro_kernel/x86_64/sandybridge/ks_gaussian_asm_d8x4.c \
 								  micro_kernel/x86_64/sandybridge/ks_gaussian_svml_d8x4.c \
 								  \
 								  micro_kernel/x86_64/sandybridge/ks_gaussian_int_d8x4_var2.c \
