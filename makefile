@@ -4,7 +4,6 @@ FRAME_CC_SRC=     \
 								  frame/dgsks.c \
 								  frame/dgsks_ref.c \
 									frame/ks_util.c \
-									frame/ks_kernel.c \
 
 FRAME_CPP_SRC=    \
 								  frame/omp_dgsks_list.cpp \

@@ -55,6 +55,11 @@
 #include <ks.h>
 #define min( i, j ) ( (i)<(j) ? (i): (j) )
 
+// Global kernel table.
+#include <ks_kernel.h>
+
+
+
 
 /* 
  * --------------------------------------------------------------------------
@@ -585,11 +590,12 @@ void dgsks_macro_kernel(
           if ( i + DKS_MR >= m ) {
             aux.b_next += DKS_NR * k;
           }
-          ks_gaussian_int_d8x4(
+          //ks_gaussian_int_d8x4(
           //ks_gaussian_svml_d8x4(
+          ( *micro[ 0 ] )(
               k,
               KS_RHS,
-              NULL,
+              packh + j,
               &packu[ i ],
               &packA2[ i ],
               &packA[ i * k ],
@@ -636,10 +642,11 @@ void dgsks_macro_kernel(
             aux.b_next += DKS_NR * k;
           }
 
-          ks_polynomial_int_d8x4(
+          //ks_polynomial_int_d8x4(
+          ( *micro[ 1 ] )(
               k,
               KS_RHS,
-              NULL,
+              packh + j,
               &packu[ i ],
               &packA2[ i ],
               &packA[ i * k ],

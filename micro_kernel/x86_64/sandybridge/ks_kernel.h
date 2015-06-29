@@ -1,8 +1,22 @@
-#include <ks.h>
-
 void ks_gaussian_int_d8x4(
     int    k,
     int    rhs,
+    double *h,
+    double *u,
+    double *a,
+    double *aa,
+    double *b,
+    double *bb,
+    double *w,
+    double *c,
+    ks_t   *ker,
+    aux_t  *aux
+    );
+
+void ks_variable_bandwidth_gaussian_int_d8x4(
+    int    k,
+    int    rhs,
+    double *h,
     double *u,
     double *a,
     double *aa,
@@ -17,6 +31,7 @@ void ks_gaussian_int_d8x4(
 void ks_polynomial_int_d8x4(
     int    k,
     int    rhs,
+    double *h,
     double *u,
     double *a,
     double *aa,
@@ -28,9 +43,10 @@ void ks_polynomial_int_d8x4(
     aux_t  *aux
     );
 
-void (*micro[ 2 ])(
+void (*micro[ 2 ]) (
     int    k,
     int    rhs,
+    double *h,
     double *u,
     double *a,
     double *aa,
@@ -40,5 +56,8 @@ void (*micro[ 2 ])(
     double *c,
     ks_t   *ker,
     aux_t  *aux
-    ) =
-{ ks_gaussian_int_d8x4, ks_polynomial_int_d8x4 };
+    ) = { 
+    ks_gaussian_int_d8x4,
+    ks_polynomial_int_d8x4,
+  };
+

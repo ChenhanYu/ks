@@ -5,7 +5,8 @@ echo "KS_DIR = $KS_DIR"
 # Manually set the target architecture.
 export KS_ARCH_MAJOR=x86_64
 export KS_ARCH_MINOR=sandybridge
-echo "KS_ARCH = $KS_ARCH_MAJOR/$KS_ARCH_MINOR"
+export KS_ARCH=$KS_ARCH_MAJOR/$KS_ARCH_MINOR
+echo "KS_ARCH = $KS_ARCH"
 
 
 # Load the Intel and the cmake module.
