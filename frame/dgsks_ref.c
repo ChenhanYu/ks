@@ -160,8 +160,8 @@ void dgsks_ref(
   As = (double*)malloc( sizeof(double) * m * k );
   Bs = (double*)malloc( sizeof(double) * n * k );
   Cs = (double*)malloc( sizeof(double) * m * n );
-  us = (double*)malloc( sizeof(double) * m );
-  ws = (double*)malloc( sizeof(double) * n );
+  us = (double*)malloc( sizeof(double) * m * KS_RHS );
+  ws = (double*)malloc( sizeof(double) * n * KS_RHS );
   // ------------------------------------------------------------------------
 
 
@@ -174,8 +174,9 @@ void dgsks_ref(
     for ( p = 0; p < k; p ++ ) {
       As[ i * k + p ] = XA[ alpha[ i ] * k + p ];
     }
-    //us[ i ] = u[ alpha[ i ] ];
-    us[ i ] = u[ umap[ i ] ];
+    for ( p = 0; p < KS_RHS; p ++ ) {
+      us[ i * KS_RHS + p ] = u[ umap[ i ] * KS_RHS + p ];
+    }
   }
   // ------------------------------------------------------------------------
 
@@ -187,12 +188,10 @@ void dgsks_ref(
   for ( j = 0; j < n; j ++ ) {
     for ( p = 0; p < k; p ++ ) {
       Bs[ j * k + p ] = XB[ beta[ j ] * k + p ];
-      //printf( "%lf, ", Bs[ j * k + p ]);
     }
-    ws[ j ] = w[ omega[ j ] ];
-    //if ( pack_bandwidth ) {
-      //kernel->packh[ j ] = kernel->h[ beta[ j ] ];
-    //}
+    for ( p = 0; p < KS_RHS; p ++ ) {
+      ws[ j * KS_RHS + p ] = w[ omega[ j ] * KS_RHS + p ];
+    }
   }
   // ------------------------------------------------------------------------
   tcollect = omp_get_wtime() - beg;
@@ -364,19 +363,35 @@ void dgsks_ref(
   // ------------------------------------------------------------------------
   // Kernel Summation (GEMV)
   // ------------------------------------------------------------------------
-  cblas_dgemv(
+  //cblas_dgemv(
+  //    CblasColMajor,
+  //    CblasNoTrans,
+  //    m,
+  //    n,
+  //    1.0,
+  //    Cs,
+  //    m,
+  //    ws,
+  //    1,
+  //    1.0,
+  //    us,
+  //    1
+  //    );
+  cblas_dgemm(
       CblasColMajor,
       CblasNoTrans,
+      CblasNoTrans,
       m,
+      KS_RHS,
       n,
       1.0,
       Cs,
       m,
       ws,
-      1,
+      m,
       1.0,
       us,
-      1
+      m
       );
   // ------------------------------------------------------------------------
   tgemv = omp_get_wtime() - beg;
@@ -388,8 +403,10 @@ void dgsks_ref(
   // ------------------------------------------------------------------------
   #pragma omp parallel for
   for ( i = 0; i < m; i ++ ) {
-    //u[ alpha[ i ] ] = us[ i ];
-    u[ umap[ i ] ] = us[ i ];
+    for ( p = 0; p < KS_RHS; p ++ ) {
+      //u[ alpha[ i ] ] = us[ i ];
+      u[ umap[ i ] * KS_RHS + p ] = us[ i * KS_RHS + p ];
+    }
   }
   // ------------------------------------------------------------------------
 

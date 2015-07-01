@@ -34,15 +34,6 @@
  *
  *
  * Modification:
- * Chenhan
- * Mar 16, 2015: Change the omp thread number control to get_env(). Split
- *               the rank-k update and exp kernels to head files.
- *               New tanh kernel.
- *
- * Chenhan
- * Mar 16, 2015: Change dgsks interface to support a separate ulist.
- *               Increase all packing buffer by 1 to deal with the preloading 
- *               segmentation fault in the rank-k update micro-kernel.
  *
  * Chenhan
  * May 05, 2015: Fix the double free bug in kernel->packh. Now I discard 
@@ -50,6 +41,15 @@
  *               there is an additional parameter needed to be passed to
  *               the macro-kernel.
  *
+ * Chenhan
+ * Jun 29, 2015: var2 has all been deprecated. Now all micro-kernels will
+ *               decide whether or not to accumulate the rank-k update
+ *               result based on the value of pc. Also the micro-kernel
+ *               interface has been unified; thus, now they are called by
+ *               function pointers. See the head file ks_kernel.h in the
+ *               micro-kernel directory.
+ *
+ * Chenhan
  * */
 
 #include <ks.h>
@@ -623,40 +623,37 @@ void dgsks(
     packC = ks_malloc_aligned( ldc, padn, sizeof(double) ); 
 
 
-    for ( jc = 0; jc < n; jc += DKS_NC ) {           // 6-th loop
+    for ( jc = 0; jc < n; jc += DKS_NC ) {            // 6-th loop
       jb = min( n - jc, DKS_NC );
-      for ( pc = 0; pc < k; pc += DKS_KC ) {         // 5-th loop
+      for ( pc = 0; pc < k; pc += DKS_KC ) {          // 5-th loop
         pb = min( k - pc, DKS_KC );
 
-        //printf( "Here, pb = %d\n", pb ); 
 
-        // packB, packw, packbb
         #pragma omp parallel for num_threads( ks_ic_nt ) private( jr )
-        for ( j = 0; j < jb; j += DKS_NR ) {
+        for ( j = 0; j < jb; j += DKS_NR ) {          // packB, packB2, packw
           
           if ( pc + DKS_KC >= k ) {
             // Initialize w
-            for ( jr = 0; jr < DKS_NR; jr ++ ) {
-              packw[ j + jr ] = 0.0;
-            }
+            //for ( jr = 0; jr < DKS_NR; jr ++ ) {
+            //  packw[ j + jr ] = 0.0;
+            //}
 
-            //packw_rhsxnc(
-            //  min( jb - j, DKS_NR ),
-            //  KS_RHS,
-            //  w,
-            //  KS_RHS,
-            //  &wmap[ jc + j + jr ],
-            //  &packw[ j * KS_RHS ]
-            //  );
+            packw_rhsxnc(
+                min( jb - j, DKS_NR ),
+                KS_RHS,
+                w,
+                KS_RHS,
+                &wmap[ jc + j ],
+                &packw[ j * KS_RHS ]
+                );
 
             // packw, packB2, packh (alternatively)
             for ( jr = 0; jr < min( jb - j, DKS_NR ); jr ++ ) {
-              packw[ j + jr ] = w[ wmap[ jc + j + jr ] ];
+              //packw[ j + jr ] = w[ wmap[ jc + j + jr ] ];
               if ( pack_norm ) {
                 packB2[ j + jr ] = XB2[ bmap[ jc + j + jr ] ];
               }
               if ( pack_bandwidth ) {
-                //kernel->packh[ j + jr ] = kernel->h[ bmap[ jc + j + jr ] ];
                 packh[ j + jr ] = kernel->h[ bmap[ jc + j + jr ] ];
               }
             }
@@ -668,39 +665,36 @@ void dgsks(
               &XB[ pc ],
               k, // should be ldXB instead
               &bmap[ jc + j ],
-              //&packB[ j * k ]
               &packB[ j * pb ]
               );
         }
 
-        //printf( "After PackB\n" );
-        //printf( "PackB: %lf, %lf, %lf, %lf\n", packB[ 0 ], packB[ 1 ], packB[ 2 ], packB[ 3 ] );
-        //printf( "PackB: %lf, %lf, %lf, %lf\n", packB[ 4 ], packB[ 5 ], packB[ 6 ], packB[ 7 ] );
         
         #pragma omp parallel for num_threads( ks_ic_nt ) private( ic, ib, i, ir )
-        for ( ic = 0; ic < m; ic += DKS_MC ) {       // 4-th loop
+        for ( ic = 0; ic < m; ic += DKS_MC ) {        // 4-th loop
 
           // Get the thread id ( 0 ~ 9 )
           int     tid = omp_get_thread_num();
-//          int     tid = 0;
+          // int     tid = 0;
 
           ib = min( m - ic, DKS_MC );
           for ( i = 0; i < ib; i += DKS_MR ) {
             if ( pc + DKS_KC >= k ) {
+
+              packu_rhsxmc(
+                  min( ib - i, DKS_MR ),
+                  KS_RHS,
+                  u,
+                  KS_RHS,
+                  &umap[ ic + i ],
+                  &packu[ tid * DKS_MC * KS_RHS + i * KS_RHS ]
+                  );
+
+
               for ( ir = 0; ir < min( ib - i, DKS_MR ); ir ++ ) {
-                // -----------------------------------------------------------------
-                // Unified ulist ( u and A share amap ) 
-                // ----------------------------------------------------------------- 
-                //packu[ tid * DKS_MC + i + ir ] = u[ amap[ ic + i + ir ] ];
-                //packu[ i + ir ] = u[ amap[ ic + i + ir ] ];
-                // -----------------------------------------------------------------
-                // Separate ulist ( u has a separate umap )
-                // -----------------------------------------------------------------
-                packu[ tid * DKS_MC + i + ir ] = u[ umap[ ic + i + ir ] ];
-                // -----------------------------------------------------------------
+                //packu[ tid * DKS_MC + i + ir ] = u[ umap[ ic + i + ir ] ]; 
                 if ( pack_norm ) {
                   packA2[ tid * DKS_MC + i + ir ] = XA2[ amap[ ic + i + ir ] ];
-                  //packA2[ i + ir ] = XA2[ amap[ ic + i + ir ] ];
                 }
               }
             }
@@ -711,42 +705,24 @@ void dgsks(
                 k,
                 &amap[ ic + i ],
                 &packA[ tid * DKS_MC * pb + i * pb ]
-                //&packA[ tid * DKS_MC * DKS_KC + i * pb ]
-                //&packA[ i * pb ]
                 );
           }
-          //printf( "After PackA\n" );
-          //printf( "PackA: %lf, %lf, %lf, %lf, %lf, %lf, %lf, %lf\n", 
-          //    packA[ 0 ], packA[ 1 ], packA[ 2 ], packA[ 3 ],
-          //    packA[ 4 ], packA[ 5 ], packA[ 6 ], packA[ 7 ]
-          //    );
-          //printf( "PackA: %lf, %lf, %lf, %lf, %lf, %lf, %lf, %lf\n", 
-          //    packA[ 8 ], packA[ 9 ], packA[ 10 ], packA[ 11 ],
-          //    packA[ 12 ], packA[ 13 ], packA[ 14 ], packA[ 15 ]
-          //    );
 
           // Check if this is the last kc interation
           if ( pc + DKS_KC < k ) {
-            // call the macro kernel
             rank_k_macro_kernel(
                 ib,
                 jb,
                 pb,
-                packA + tid * DKS_MC * pb,
-                //packA + tid * DKS_MC * DKS_KC,
-                //packA,
+                packA   + tid * DKS_MC * pb,
                 packB,
-                &packC[ ic * padn ], // packed
-                //&packC[ ic ],        // nonpacked
-                ( ( ib - 1 ) / DKS_MR + 1 ) * DKS_MR, // packed
-                //ldc,                                // nonpacked
+                packC   + ic * padn,                  // packed
+                ( ( ib - 1 ) / DKS_MR + 1 ) * DKS_MR, // packed ldc
                 pc
                 );
           }
           else {
-
-            /* call the macro kernel */
-            dgsks_macro_kernel(                      // 1~3 loops
+            dgsks_macro_kernel(                       // 1~3 loops
                 kernel,
                 ib,
                 jb,
@@ -759,31 +735,23 @@ void dgsks(
                 packw,
                 packh,
                 packC  + ic * padn,                   // packed
-                ( ( ib - 1 ) / DKS_MR + 1 ) * DKS_MR, // packed
+                ( ( ib - 1 ) / DKS_MR + 1 ) * DKS_MR, // packed ldc
                 pc
                 );
 
-
-            //printf( "Packu: %lf, %lf, %lf, %lf, %lf, %lf, %lf, %lf\n", 
-            //    packu[ 0 ], packu[ 1 ], packu[ 2 ], packu[ 3 ],
-            //    packu[ 4 ], packu[ 5 ], packu[ 6 ], packu[ 7 ]
-            //    );
-
             /* Unpack u */
-            if ( pc + DKS_KC >= k ) {
-              for ( i = 0; i < ib; i += DKS_MR ) {
-                for ( ir = 0; ir < min( ib - i, DKS_MR ); ir ++ ) {
-                  // -----------------------------------------------------------------
-                  // Unified ulist ( u and A share amap ) 
-                  // ----------------------------------------------------------------- 
-                  //u[ amap[ ic + i + ir ] ] = packu[ tid * DKS_MC + i + ir ];
-                  // -----------------------------------------------------------------
-                  // Separate ulist ( u has a separate umap )
-                  // -----------------------------------------------------------------
-                  u[ umap[ ic + i + ir ] ] = packu[ tid * DKS_MC + i + ir ];
-                  // -----------------------------------------------------------------
-                }
-              }
+            for ( i = 0; i < ib; i += DKS_MR ) {
+              unpacku_rhsxmc(
+                  min( ib - i, DKS_MR ),
+                  KS_RHS,
+                  u,
+                  KS_RHS,
+                  &umap[ ic + i ],
+                  &packu[ tid * DKS_MC * KS_RHS + i * KS_RHS ]
+                  );
+              //for ( ir = 0; ir < min( ib - i, DKS_MR ); ir ++ ) {
+              //  u[ umap[ ic + i + ir ] ] = packu[ tid * DKS_MC + i + ir ];
+              //}
             }
           }
         }
@@ -794,11 +762,10 @@ void dgsks(
   }
   else {
 
-    //printf( "Before dgsks main loop\n" );
 
-    for ( jc = 0; jc < n; jc += DKS_NC ) {           // 6-th loop
+    for ( jc = 0; jc < n; jc += DKS_NC ) {            // 6-th loop
       jb = min( n - jc, DKS_NC );
-      for ( pc = 0; pc < k; pc += DKS_KC ) {         // 5-th loop
+      for ( pc = 0; pc < k; pc += DKS_KC ) {          // 5-th loop
         pb = min( k - pc, DKS_KC );
 
         // packB, packw, packbb
@@ -820,23 +787,16 @@ void dgsks(
 
 
 
-
-          //printf( "dgsks(): packw & packB2, j = %d, jb = %d\n", j, jb );
           // packw and packB2
           for ( jr = 0; jr < min( jb - j, DKS_NR ); jr ++ ) {
-            //printf( "dgsks(): packw & packB2, j = %d, jr = %d\n", j, jr );
             //packw[ j + jr ] = w[ wmap[ jc + j + jr ] ];
             if ( pack_norm ) {
               packB2[ j + jr ] = XB2[ bmap[ jc + j + jr ] ];
             }
             if ( pack_bandwidth ) {
-              //kernel->packh[ j + jr ] = kernel->h[ bmap[ jc + j + jr ] ];
               packh[ j + jr ] = kernel->h[ bmap[ jc + j + jr ] ];
             }
           }
-          //printf( "dgsks(): packB, jc = %d, j = %d, jb = %d, k = %d\n", jc, j, jb, k );
-          //printf( "bmap pointer: jc + j = %d\n", jc + j );
-          //printf( "packB pointer: j * k = %d\n", j * k );
 
           // packB
           packB_kcxnc(
@@ -872,20 +832,9 @@ void dgsks(
               );
 
             for ( ir = 0; ir < min( ib - i, DKS_MR ); ir ++ ) {
-
-              // -----------------------------------------------------------------
-              // Unified ulist ( u and A share amap ) 
-              // ----------------------------------------------------------------- 
-              //packu[ tid * DKS_MC + i + ir ] = u[ amap[ ic + i + ir ] ];
-              //packu[ i + ir ] = u[ amap[ ic + i + ir ] ];
-              // -----------------------------------------------------------------
-              // Separate ulist ( u has a separate umap )
-              // -----------------------------------------------------------------
               //packu[ tid * DKS_MC + i + ir ] = u[ umap[ ic + i + ir ] ];
-              // ----------------------------------------------------------------- 
               if ( pack_norm ) {
                 packA2[ tid * DKS_MC + i + ir ] = XA2[ amap[ ic + i + ir ] ];
-                //packA2[ i + ir ] = XA2[ amap[ ic + i + ir ] ];
               }
             }
             //printf( "i = %d, ib = %d, min = %d\n", i, ib, min( ib - i, DKS_MR ) );
@@ -896,11 +845,8 @@ void dgsks(
                 k,
                 &amap[ ic + i ],
                 &packA[ tid * DKS_MC * pb + i * pb ]
-                //&packA[ tid * DKS_MC * DKS_KC + i * k ]
-                //&packA[ i * k ]
                 );
           }
-          //printf( "PackA: %lf, %lf, %lf, %lf\n", packA[ 8 ], packA[ 9 ], packA[ 10 ], packA[ 11 ] );
 
           dgsks_macro_kernel(                      // 1~3 loops
               kernel,
@@ -932,17 +878,9 @@ void dgsks(
               );
 
 
+            // unpacku with single rhs.
             //for ( ir = 0; ir < min( ib - i, DKS_MR ); ir ++ ) {
-              // -----------------------------------------------------------------
-              // Unified ulist ( u and A share amap ) 
-              // ----------------------------------------------------------------- 
-              //u[ amap[ ic + i + ir ] ] = packu[ tid * DKS_MC + i + ir ]; // This is possible a concurrent write.
-              //u[ amap[ ic + i + ir ] ] = packu[ i + ir ];
-              // -----------------------------------------------------------------
-              // Separate ulist ( u has a separate umap )
-              // -----------------------------------------------------------------
-              //u[ umap[ ic + i + ir ] ] = packu[ tid * DKS_MC + i + ir ];
-              // -----------------------------------------------------------------
+            //  u[ umap[ ic + i + ir ] ] = packu[ tid * DKS_MC + i + ir ];
             //}
           }
         }
@@ -971,7 +909,6 @@ void dgsks(
     case KS_GAUSSIAN:
       break;
     case KS_GAUSSIAN_VAR_BANDWIDTH:
-      //free( kernel->packh );
       free( packh );
       break;
     case KS_POLYNOMIAL:
