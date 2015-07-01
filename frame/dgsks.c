@@ -405,8 +405,7 @@ void rank_k_macro_kernel(
           k,
           &packA[ i * k ],
           &packB[ j * k ],
-          &packC[ j * ldc + i * DKS_NR ], // packed
-          //&packC[ j * ldc + i ],        // nonpacked
+          &packC[ j * ldc + i * DKS_NR ],             // packed
           ldc,
           &aux
           );
@@ -472,12 +471,12 @@ void dgsks_macro_kernel(
           k,
           KS_RHS,
           packh  + j,
-          packu  + i ,
-          packA2 + i ,
-          packA  + i * k ,
-          packB2 + j ,
-          packB  + j * k ,
-          packw  + j,
+          packu  + i * KS_RHS,
+          packA2 + i,
+          packA  + i * k,
+          packB2 + j,
+          packB  + j * k,
+          packw  + j * KS_RHS,
           packC  + j * ldc + i * DKS_NR, // packed
           kernel,
           &aux
@@ -555,10 +554,10 @@ void dgsks(
 
   packA  = ks_malloc_aligned( DKS_KC, ( DKS_MC + 1 ) * ks_ic_nt, sizeof(double) ); 
   packA2 = ks_malloc_aligned(      1, ( DKS_MC + 1 ) * ks_ic_nt, sizeof(double) ); 
-  packu  = ks_malloc_aligned(      1, ( DKS_MC + 1 ) * ks_ic_nt, sizeof(double) ); 
+  packu  = ks_malloc_aligned( KS_RHS, ( DKS_MC + 1 ) * ks_ic_nt, sizeof(double) ); 
   packB  = ks_malloc_aligned( DKS_KC, ( DKS_NC + 1 )           , sizeof(double) ); 
   packB2 = ks_malloc_aligned(      1, ( DKS_NC + 1 )           , sizeof(double) ); 
-  packw  = ks_malloc_aligned(      1, ( DKS_NC + 1 )           , sizeof(double) ); 
+  packw  = ks_malloc_aligned( KS_RHS, ( DKS_NC + 1 )           , sizeof(double) ); 
 
 
 
@@ -727,7 +726,7 @@ void dgsks(
                 ib,
                 jb,
                 pb,
-                packu  + tid * DKS_MC,
+                packu  + tid * DKS_MC * KS_RHS,
                 packA  + tid * DKS_MC * pb,
                 packA2 + tid * DKS_MC,
                 packB,
@@ -853,7 +852,7 @@ void dgsks(
               ib,
               jb,
               pb,
-              packu  + tid * DKS_MC,
+              packu  + tid * DKS_MC * KS_RHS,
               packA  + tid * DKS_MC * pb,
               packA2 + tid * DKS_MC,
               packB,

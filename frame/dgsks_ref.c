@@ -175,7 +175,7 @@ void dgsks_ref(
       As[ i * k + p ] = XA[ alpha[ i ] * k + p ];
     }
     for ( p = 0; p < KS_RHS; p ++ ) {
-      us[ i * KS_RHS + p ] = u[ umap[ i ] * KS_RHS + p ];
+      us[ p * m + i ] = u[ umap[ i ] * KS_RHS + p ];
     }
   }
   // ------------------------------------------------------------------------
@@ -190,7 +190,7 @@ void dgsks_ref(
       Bs[ j * k + p ] = XB[ beta[ j ] * k + p ];
     }
     for ( p = 0; p < KS_RHS; p ++ ) {
-      ws[ j * KS_RHS + p ] = w[ omega[ j ] * KS_RHS + p ];
+      ws[ p * n + j ] = w[ omega[ j ] * KS_RHS + p ];
     }
   }
   // ------------------------------------------------------------------------
@@ -388,7 +388,7 @@ void dgsks_ref(
       Cs,
       m,
       ws,
-      m,
+      n,
       1.0,
       us,
       m
@@ -404,11 +404,32 @@ void dgsks_ref(
   #pragma omp parallel for
   for ( i = 0; i < m; i ++ ) {
     for ( p = 0; p < KS_RHS; p ++ ) {
-      //u[ alpha[ i ] ] = us[ i ];
-      u[ umap[ i ] * KS_RHS + p ] = us[ i * KS_RHS + p ];
+      u[ umap[ i ] * KS_RHS + p ] = us[ p * m + i ];
     }
   }
   // ------------------------------------------------------------------------
+  
+  // DEBUG
+  /*
+  printf( "u = \n" );
+  for ( p = 0; p < KS_RHS; p ++ ) {
+    for ( i = 0; i < m; i ++ ) {
+      printf( "%lf, ", us[ p * m + i ] );
+    }
+    printf( "\n" );
+  }
+
+  printf( "w = \n" );
+  for ( p = 0; p < KS_RHS; p ++ ) {
+    for ( j = 0; j < n; j ++ ) {
+      printf( "%lf, ", ws[ p * n + j ] );
+    }
+    printf( "\n" );
+  }
+  */
+
+  
+
 
 
   // ------------------------------------------------------------------------

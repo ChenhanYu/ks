@@ -57,7 +57,7 @@
 #define DKS_PACK_MR 8
 #define DKS_PACK_NR 4
 
-#define KS_RHS 1
+#define KS_RHS 3
 #define KS_NUM_THREAD 20
 
 typedef union {

@@ -124,12 +124,15 @@ void test_dgsks(
   for ( i = 0; i < m; i ++ ) {
     //amap[ i ] = i * 2;
     amap[ i ] = i;
-    umap[ i ] = i * 2;
+    //umap[ i ] = i * 2;
+    umap[ i ] = i;
   }
 
   for ( j = 0; j < n; j ++ ) {
-    bmap[ j ] = j * 2 + 1;
-    wmap[ j ] = j * 2 + 1;
+    //bmap[ j ] = j * 2 + 1;
+    bmap[ j ] = j;
+    //wmap[ j ] = j * 2 + 1;
+    wmap[ j ] = j;
   }
 
   // random[ 0, 0.1 ]
@@ -374,7 +377,7 @@ void test_dgsks(
 
   switch ( kernel.type ) {
     case KS_GAUSSIAN:
-      flops = ( (double)( m * n ) / ( 1024 * 1024 * 1024 ) ) * ( 2 * k + 35 );
+      flops = ( (double)( m * n ) / ( 1024 * 1024 * 1024 ) ) * ( 2 * k + 35 + 2 );
       break;
     case KS_GAUSSIAN_VAR_BANDWIDTH:
       flops = ( (double)( m * n ) / ( 1024 * 1024 * 1024 ) ) * ( 2 * k + 35 );
