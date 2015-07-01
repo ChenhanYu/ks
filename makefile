@@ -9,28 +9,25 @@ FRAME_CPP_SRC=    \
 								  frame/omp_dgsks_list.cpp \
 
 KERNEL_SRC=       \
-								  micro_kernel/x86_64/sandybridge/ks_gaussian_int_d8x4.c \
-								  micro_kernel/x86_64/sandybridge/ks_gaussian_svml_d8x4.c \
+								  micro_kernel/$(KS_ARCH)/ks_gaussian_int_d8x4.c \
+								  micro_kernel/$(KS_ARCH)/ks_gaussian_svml_d8x4.c \
 								  \
-								  micro_kernel/x86_64/sandybridge/ks_variable_bandwidth_gaussian_int_d8x4.c \
+								  micro_kernel/$(KS_ARCH)/ks_variable_bandwidth_gaussian_int_d8x4.c \
 								  \
-								  micro_kernel/x86_64/sandybridge/ks_polynomial_int_d8x4.c \
+								  micro_kernel/$(KS_ARCH)/ks_polynomial_int_d8x4.c \
 									\
-								  micro_kernel/x86_64/sandybridge/ks_laplace3d_int_d8x4.c \
+								  micro_kernel/$(KS_ARCH)/ks_laplace3d_int_d8x4.c \
 								  \
-								  micro_kernel/x86_64/sandybridge/ks_tanh_int_d8x4.c \
+								  micro_kernel/$(KS_ARCH)/ks_tanh_int_d8x4.c \
 									\
-								  micro_kernel/x86_64/sandybridge/ks_quartic_int_d8x4.c \
+								  micro_kernel/$(KS_ARCH)/ks_quartic_int_d8x4.c \
 									\
-								  micro_kernel/x86_64/sandybridge/ks_epanechnikov_int_d8x4.c \
+								  micro_kernel/$(KS_ARCH)/ks_epanechnikov_int_d8x4.c \
 									\
-								  micro_kernel/x86_64/sandybridge/ks_multiquadratic_int_d8x4.c \
+								  micro_kernel/$(KS_ARCH)/ks_multiquadratic_int_d8x4.c \
 									\
-								  micro_kernel/x86_64/sandybridge/ks_rank_k_int_d8x4.c \
-								  micro_kernel/x86_64/sandybridge/ks_rank_k_asm_d8x4.c \
-								  \
-								  micro_kernel/x86_64/sandybridge/exp_int_d4.c \
-								  micro_kernel/x86_64/sandybridge/pow_int_d4.c \
+								  micro_kernel/$(KS_ARCH)/ks_rank_k_int_d8x4.c \
+								  micro_kernel/$(KS_ARCH)/ks_rank_k_asm_d8x4.c \
 	
 FRAME_MIC_CC_SRC= \
 								  frame/dgsks_mic.c \
