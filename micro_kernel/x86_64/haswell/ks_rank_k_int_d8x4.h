@@ -3,6 +3,7 @@
 
   __asm__ volatile( "prefetcht0 0(%0)    \n\t" : :"r"( a ) );
   __asm__ volatile( "prefetcht2 0(%0)    \n\t" : :"r"( aux->b_next ) );
+  __asm__ volatile( "prefetcht0 0(%0)    \n\t" : :"r"( c ) );
 
 
   c03_0.v = _mm256_setzero_pd();

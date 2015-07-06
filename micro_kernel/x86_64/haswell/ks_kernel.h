@@ -1,3 +1,21 @@
+void ks_rank_k_asm_d8x4(
+    int    k,
+    double *a,
+    double *b,
+    double *c,
+    int    ldc,
+    aux_t  *aux
+    );
+
+void ks_rank_k_int_d8x4(
+    int    k,
+    double *a,
+    double *b,
+    double *c,
+    int    ldc,
+    aux_t  *aux
+    );
+
 void ks_gaussian_int_d8x4(
     int    k,
     int    rhs,
@@ -158,3 +176,14 @@ void (*micro[ 8 ]) (
     ks_epanechnikov_int_d8x4
   };
 
+void (*rankk) (
+    int    k,
+    double *a,
+    double *b,
+    double *c,
+    int    ldc,
+    aux_t  *aux
+    ) = {
+  //ks_rank_k_asm_d8x4
+  ks_rank_k_int_d8x4
+};

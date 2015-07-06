@@ -401,7 +401,8 @@ void rank_k_macro_kernel(
       }
 
       //ks_rank_k_int_d8x4(
-      ks_rank_k_asm_d8x4(
+      //ks_rank_k_asm_d8x4(
+      ( *rankk ) (
           k,
           &packA[ i * k ],
           &packB[ j * k ],
