@@ -263,7 +263,7 @@ void omp_dgsks_list_separated_u_symmetric(
     XA2[ i ] = tmp;
   }
  
-  //printf( "Call omp_dgsks_list\n" );
+  printf( "Call omp_dgsks_list\n" );
 
   // Call omp_dgsks_list()
   omp_dgsks_list(
@@ -327,7 +327,7 @@ void omp_dgsks_list(
     }
   }
 
-  //printf( "Finish Initialize u_local\n" );
+  printf( "Finish Initialize u_local\n" );
 
 
   // Initialize workload
@@ -351,11 +351,11 @@ void omp_dgsks_list(
   }
   
 
-  //printf( "Finish jobs distribution: %d workers\n", KS_NUM_THREAD );
+  printf( "Finish jobs distribution: %d workers\n", KS_NUM_THREAD );
 
 
   // Dequeue in parallel with omp parallel for
-#pragma omp parallel for num_threads( KS_NUM_THREAD )
+  #pragma omp parallel for num_threads( KS_NUM_THREAD )
   for ( int i = 0; i < KS_NUM_THREAD; i++ ) {
     while ( !jobs[ i ].empty() ) {
       int tar = jobs[ i ].front();

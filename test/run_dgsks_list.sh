@@ -26,7 +26,7 @@
 #done
 
 
-./test_dgsks_list.x 4096 512 240 500
-#./test_dgsks_list.x 4096 512 240 100
+#./test_dgsks_list.x 4096 512 240 500
+./test_dgsks_list.x 4096 512 260 100
 
 #./test_dgsks_list_mic.x 8192 600 240 500
