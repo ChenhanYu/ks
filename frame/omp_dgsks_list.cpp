@@ -66,8 +66,6 @@ void omp_dgsks_list_unsymmetric(
     std::vector< std::vector<int> > &wlist
     )
 {
-  int    i, p;
-  double tmp;
   double *XA2, *XB2;
 
   XA2  = (double*)malloc( sizeof(double) * nxa );
@@ -75,9 +73,9 @@ void omp_dgsks_list_unsymmetric(
 
   // Compute XA2
   #pragma omp parallel for 
-  for ( i = 0; i < nxa; i ++ ) {
-    tmp = 0.0;
-    for ( p = 0; p < k; p ++ ) {
+  for ( int i = 0; i < nxa; i ++ ) {
+    double tmp = 0.0;
+    for ( int p = 0; p < k; p ++ ) {
       tmp += XA[ i * k + p ] * XA[ i * k + p ];
     }
     XA2[ i ] = tmp;
@@ -85,9 +83,9 @@ void omp_dgsks_list_unsymmetric(
   
   // Compute XB2
   #pragma omp parallel for 
-  for ( i = 0; i < nxb; i ++ ) {
-    tmp = 0.0;
-    for ( p = 0; p < k; p ++ ) {
+  for ( int i = 0; i < nxb; i ++ ) {
+    double tmp = 0.0;
+    for ( int p = 0; p < k; p ++ ) {
       tmp += XB[ i * k + p ] * XB[ i * k + p ];
     }
     XB2[ i ] = tmp;
@@ -125,8 +123,6 @@ void omp_dgsks_list_symmetric(
     std::vector< std::vector<int> > &wlist
     )
 {
-  int    i, p;
-  double tmp;
   double *XA2;
 
   XA2  = (double*)malloc( sizeof(double) * nxa );
@@ -136,9 +132,9 @@ void omp_dgsks_list_symmetric(
 
   // Compute XA2
   #pragma omp parallel for 
-  for ( i = 0; i < nxa; i ++ ) {
-    tmp = 0.0;
-    for ( p = 0; p < k; p ++ ) {
+  for ( int i = 0; i < nxa; i ++ ) {
+    double tmp = 0.0;
+    for ( int p = 0; p < k; p ++ ) {
       tmp += XA[ i * k + p ] * XA[ i * k + p ];
     }
     XA2[ i ] = tmp;
@@ -186,8 +182,6 @@ void omp_dgsks_list_separated_u_unsymmetric(
     std::vector< std::vector<int> > &wlist
     )
 {
-  int    i, p;
-  double tmp;
   double *XA2, *XB2;
 
   XA2  = (double*)malloc( sizeof(double) * nxa );
@@ -195,9 +189,9 @@ void omp_dgsks_list_separated_u_unsymmetric(
 
   // Compute XA2
   #pragma omp parallel for 
-  for ( i = 0; i < nxa; i ++ ) {
-    tmp = 0.0;
-    for ( p = 0; p < k; p ++ ) {
+  for ( int i = 0; i < nxa; i ++ ) {
+    double tmp = 0.0;
+    for ( int p = 0; p < k; p ++ ) {
       tmp += XA[ i * k + p ] * XA[ i * k + p ];
     }
     XA2[ i ] = tmp;
@@ -205,9 +199,9 @@ void omp_dgsks_list_separated_u_unsymmetric(
   
   // Compute XB2
   #pragma omp parallel for 
-  for ( i = 0; i < nxb; i ++ ) {
-    tmp = 0.0;
-    for ( p = 0; p < k; p ++ ) {
+  for ( int i = 0; i < nxb; i ++ ) {
+    double tmp = 0.0;
+    for ( int p = 0; p < k; p ++ ) {
       tmp += XB[ i * k + p ] * XB[ i * k + p ];
     }
     XB2[ i ] = tmp;
@@ -247,22 +241,34 @@ void omp_dgsks_list_separated_u_symmetric(
     std::vector< std::vector<int> > &wlist
     )
 {
-  int    i, p;
-  double tmp;
   double *XA2;
 
   XA2  = (double*)malloc( sizeof(double) * nxa );
 
   // Compute XA2
   #pragma omp parallel for 
-  for ( i = 0; i < nxa; i ++ ) {
-    tmp = 0.0;
-    for ( p = 0; p < k; p ++ ) {
+  for ( int i = 0; i < nxa; i ++ ) {
+    double tmp = 0.0;
+    for ( int p = 0; p < k; p ++ ) {
       tmp += XA[ i * k + p ] * XA[ i * k + p ];
     }
     XA2[ i ] = tmp;
   }
- 
+
+  if ( kernel->type == KS_GAUSSIAN_VAR_BANDWIDTH ) {
+    for ( int i = 0; i < 100; i ++ ) {
+      printf( "%5.2lf, ", kernel->h[ i ] );
+    }
+    printf( "\n" );
+    for ( int i = 0; i < nxa; i ++ ) {
+      if ( kernel->h[ i ] > 0 ) {
+        printf( "error: h = %lf\n", kernel->h[ i ] );
+        break;
+      }
+    }
+  }
+
+
   printf( "Call omp_dgsks_list\n" );
 
   // Call omp_dgsks_list()

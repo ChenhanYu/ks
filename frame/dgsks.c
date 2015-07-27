@@ -776,6 +776,12 @@ void dgsks(
           //  packw[ j + jr ] = 0.0;
           //}
 
+          if ( pack_bandwidth ) {
+            for ( jr = 0; jr < DKS_NR; jr ++ ) {
+              packh[ j + jr ] = 0.0;
+            }
+          }
+
           packw_rhsxnc(
             min( jb - j, DKS_NR ),
             KS_RHS,

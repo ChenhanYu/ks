@@ -170,7 +170,7 @@ void test_dgsks_list(
     kernel.h[ i ] = ( -0.5 * i ) / 1000.0 ;
   }
 
-  printf( "after allocate h vector\n" );
+  //printf( "after allocate h vector\n" );
 
 
   // Test Polynomial Kernel
@@ -235,15 +235,9 @@ void test_dgsks_list(
   error = 0.0;
 
   for ( i = 0; i < nx; i ++ ) {
-    //if ( fabs( umkl[ i ] - u[ i ] ) > 0.0000000001 ) {
-    if ( fabs( umkl[ i ] - uvec[ i ] ) > 0.0000000001 ) {
-      //printf( " error\n ");
-      printf( "umkl[ %d ] = %E, u[ i ] = %E\n", i, umkl[ i ], u[ i ] );
-      //printf( "umkl[ %d ] = %lf, u[ i ] = %lf\n", i, umkl[ i ], uvec[ i ] );
-      //break;
-    }
-    //printf( "%E\n", uvec[ i ] );
-    //tmp = umkl[ i ] - u[ i ];
+    //if ( fabs( umkl[ i ] - uvec[ i ] ) > 0.0000000001 ) {
+    //  printf( "umkl[ %d ] = %E, u[ i ] = %E\n", i, umkl[ i ], uvec[ i ] );
+    //}
     tmp = umkl[ i ] - uvec[ i ];
     error += tmp * tmp;
   }

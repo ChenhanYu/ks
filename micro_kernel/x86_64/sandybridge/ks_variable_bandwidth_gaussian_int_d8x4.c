@@ -22,6 +22,7 @@ void ks_variable_bandwidth_gaussian_int_d8x4(
   double dzero  = 0.0;
   double *alpha = h;
 
+  //printf( "ks_variable_bandwidth_gaussian_int_d8x4\n" );
 
   v4df_t    c03_0,    c03_1,    c03_2,    c03_3;
   v4df_t    c47_0,    c47_1,    c47_2,    c47_3;

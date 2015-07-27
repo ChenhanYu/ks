@@ -58,7 +58,7 @@
 #define DKS_PACK_NR 4
 
 #define KS_RHS 1
-#define KS_NUM_THREAD 1
+#define KS_NUM_THREAD 20
 
 typedef union {
   __m256d v;

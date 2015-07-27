@@ -2,7 +2,6 @@ include $(KS_DIR)/make.inc
 
 KS_TEST_CC_SRC=  \
                  test_dgsks.c \
-								 test_vdexp.c \
 
 KS_TEST_CPP_SRC= \
                  test_dgsks_list.cpp \
