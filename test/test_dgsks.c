@@ -213,7 +213,9 @@ void test_dgsks(
   kernel.h = malloc( sizeof(double) * nx );
   for ( i = 0; i < nx; i ++ ) {
     //kernel.h[ i ] = -0.5;
-    kernel.h[ i ] = ( -0.5 * i ) / 1000.0 ;
+    //kernel.h[ i ] = ( -0.5 * i ) / 1000.0 ;
+    kernel.h[ i ] = ( 1.0 + 0.5 / ( 1 + exp( -1.0 * XA2[ i ] ) ) );
+    kernel.h[ i ] = -1.0 / ( 2.0 * kernel.h[ i ] * kernel.h[ i ] );
   }
   // ------------------------------------------------------------------------
 

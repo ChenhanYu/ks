@@ -247,8 +247,9 @@ void dgsks_ref(
           Cs[ j * m + i ] += XB2[ beta[ j ] ];
           Cs[ j * m + i ] *= kernel->h[ beta[ j ] ];
         }
+        vdExp( m, Cs + j * m, Cs + j * m );
       }
-      vdExp( m * n, Cs, Cs );
+      //vdExp( m * n, Cs, Cs );
       break;
     case KS_POLYNOMIAL:
       if ( kernel->powe == 2.0 ) {
@@ -401,7 +402,7 @@ void dgsks_ref(
   // ------------------------------------------------------------------------
   // Assemble us back to u
   // ------------------------------------------------------------------------
-  #pragma omp parallel for
+  #pragma omp parallel for private( p )
   for ( i = 0; i < m; i ++ ) {
     for ( p = 0; p < KS_RHS; p ++ ) {
       u[ umap[ i ] * KS_RHS + p ] = us[ p * m + i ];
