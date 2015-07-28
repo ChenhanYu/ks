@@ -255,18 +255,20 @@ void omp_dgsks_list_separated_u_symmetric(
     XA2[ i ] = tmp;
   }
 
-  if ( kernel->type == KS_GAUSSIAN_VAR_BANDWIDTH ) {
-    for ( int i = 0; i < 100; i ++ ) {
-      printf( "%5.2lf, ", kernel->h[ i ] );
-    }
-    printf( "\n" );
-    for ( int i = 0; i < nxa; i ++ ) {
-      if ( kernel->h[ i ] > 0 ) {
-        printf( "error: h = %lf\n", kernel->h[ i ] );
-        break;
-      }
-    }
-  }
+  //if ( kernel->type == KS_GAUSSIAN_VAR_BANDWIDTH ) {
+  //  for ( int i = 0; i < 100; i ++ ) {
+  //    printf( "%5.2lf, ", kernel->h[ i ] );
+  //  }
+  //  printf( "\n" );
+  //  for ( int i = 0; i < nxa; i ++ ) {
+  //    double hgoal  = ( 1.0 + 0.5 / ( 1.0 + exp( -1.0 * XA2[ i ] ) ) );
+  //    hgoal = -1.0 / ( 2.0 * hgoal * hgoal );
+  //    if ( fabs( kernel->h[ i ] - hgoal ) > 0.0000000001 ) {
+  //      printf( "error: h = %lf, hgoal = %lf\n", kernel->h[ i ], hgoal );
+  //      break;
+  //    }
+  //  }
+  //}
 
 
   printf( "Call omp_dgsks_list\n" );
