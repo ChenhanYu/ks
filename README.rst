@@ -1,3 +1,6 @@
+.. image:: https://github.com/ChenhanYu/ks/blob/master/logo/gsks_logo.001.png
+  :alt: ks logo
+  :align: center
 
 GSKS (General Stride Kernel Summation)
 README
