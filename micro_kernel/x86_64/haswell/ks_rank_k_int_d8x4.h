@@ -108,7 +108,7 @@
     //printf( "b0  = %lf, %lf, %lf, %lf\n", b0.d[0], b0.d[1], b0.d[2], b0.d[3] );
 
     c03_0.v = _mm256_fmadd_pd( a03.v, b0.v, c03_0.v );
-    c47_0.v = _mm256_fmadd_pd( a03.v, b0.v, c47_0.v );
+    c47_0.v = _mm256_fmadd_pd( a47.v, b0.v, c47_0.v );
 
     // Shuffle b ( 1, 0, 3, 2 )
     b1.v  = _mm256_shuffle_pd( b0.v, b0.v, 0x5 );

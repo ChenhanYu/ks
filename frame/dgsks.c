@@ -49,7 +49,6 @@
  *               function pointers. See the head file ks_kernel.h in the
  *               micro-kernel directory.
  *
- * Chenhan
  * */
 
 #include <ks.h>
@@ -93,109 +92,6 @@ inline void packA_kcxmc(
       *packA ++ = *a_pntr[ i ] ++;
     }
   }
-
-  /*
-  double *a_i0_pntr;
-  double *a_i1_pntr;
-  double *a_i2_pntr;
-  double *a_i3_pntr;
-  double *a_i4_pntr;
-  double *a_i5_pntr;
-  double *a_i6_pntr;
-  double *a_i7_pntr;
-
-  if ( m > 7 ) {
-    a_i0_pntr = XA + ldXA * amap[ 0 ];
-    a_i1_pntr = XA + ldXA * amap[ 1 ];
-    a_i2_pntr = XA + ldXA * amap[ 2 ];
-    a_i3_pntr = XA + ldXA * amap[ 3 ];
-    a_i4_pntr = XA + ldXA * amap[ 4 ];
-    a_i5_pntr = XA + ldXA * amap[ 5 ];
-    a_i6_pntr = XA + ldXA * amap[ 6 ];
-    a_i7_pntr = XA + ldXA * amap[ 7 ];
-  }
-  else if ( m > 6 ) {
-    a_i0_pntr = XA + ldXA * amap[ 0 ];
-    a_i1_pntr = XA + ldXA * amap[ 1 ];
-    a_i2_pntr = XA + ldXA * amap[ 2 ];
-    a_i3_pntr = XA + ldXA * amap[ 3 ];
-    a_i4_pntr = XA + ldXA * amap[ 4 ];
-    a_i5_pntr = XA + ldXA * amap[ 5 ];
-    a_i6_pntr = XA + ldXA * amap[ 6 ];
-    a_i7_pntr = XA + ldXA * amap[ 0 ];
-  }
-  else if ( m > 5 ) {
-    a_i0_pntr = XA + ldXA * amap[ 0 ];
-    a_i1_pntr = XA + ldXA * amap[ 1 ];
-    a_i2_pntr = XA + ldXA * amap[ 2 ];
-    a_i3_pntr = XA + ldXA * amap[ 3 ];
-    a_i4_pntr = XA + ldXA * amap[ 4 ];
-    a_i5_pntr = XA + ldXA * amap[ 5 ];
-    a_i6_pntr = XA + ldXA * amap[ 0 ];
-    a_i7_pntr = XA + ldXA * amap[ 0 ];
-  }
-  else if ( m > 4 ) {
-    a_i0_pntr = XA + ldXA * amap[ 0 ];
-    a_i1_pntr = XA + ldXA * amap[ 1 ];
-    a_i2_pntr = XA + ldXA * amap[ 2 ];
-    a_i3_pntr = XA + ldXA * amap[ 3 ];
-    a_i4_pntr = XA + ldXA * amap[ 4 ];
-    a_i5_pntr = XA + ldXA * amap[ 0 ];
-    a_i6_pntr = XA + ldXA * amap[ 0 ];
-    a_i7_pntr = XA + ldXA * amap[ 0 ];
-  }
-  else if ( m > 3 ) {
-    a_i0_pntr = XA + ldXA * amap[ 0 ];
-    a_i1_pntr = XA + ldXA * amap[ 1 ];
-    a_i2_pntr = XA + ldXA * amap[ 2 ];
-    a_i3_pntr = XA + ldXA * amap[ 3 ];
-    a_i4_pntr = XA + ldXA * amap[ 0 ];
-    a_i5_pntr = XA + ldXA * amap[ 0 ];
-    a_i6_pntr = XA + ldXA * amap[ 0 ];
-    a_i7_pntr = XA + ldXA * amap[ 0 ];
-  }
-  else if ( m > 2 ) {
-    a_i0_pntr = XA + ldXA * amap[ 0 ];
-    a_i1_pntr = XA + ldXA * amap[ 1 ];
-    a_i2_pntr = XA + ldXA * amap[ 2 ];
-    a_i3_pntr = XA + ldXA * amap[ 0 ];
-    a_i4_pntr = XA + ldXA * amap[ 0 ];
-    a_i5_pntr = XA + ldXA * amap[ 0 ];
-    a_i6_pntr = XA + ldXA * amap[ 0 ];
-    a_i7_pntr = XA + ldXA * amap[ 0 ];
-  }
-  else if ( m > 1 ) {
-    a_i0_pntr = XA + ldXA * amap[ 0 ];
-    a_i1_pntr = XA + ldXA * amap[ 1 ];
-    a_i2_pntr = XA + ldXA * amap[ 0 ];
-    a_i3_pntr = XA + ldXA * amap[ 0 ];
-    a_i4_pntr = XA + ldXA * amap[ 0 ];
-    a_i5_pntr = XA + ldXA * amap[ 0 ];
-    a_i6_pntr = XA + ldXA * amap[ 0 ];
-    a_i7_pntr = XA + ldXA * amap[ 0 ];
-  }
-  else {
-    a_i0_pntr = XA + ldXA * amap[ 0 ];
-    a_i1_pntr = XA + ldXA * amap[ 0 ];
-    a_i2_pntr = XA + ldXA * amap[ 0 ];
-    a_i3_pntr = XA + ldXA * amap[ 0 ];
-    a_i4_pntr = XA + ldXA * amap[ 0 ];
-    a_i5_pntr = XA + ldXA * amap[ 0 ];
-    a_i6_pntr = XA + ldXA * amap[ 0 ];
-    a_i7_pntr = XA + ldXA * amap[ 0 ];
-  }
-
-  for ( p = 0; p < k; p ++ ) {
-    *packA ++ = *a_i0_pntr++;
-    *packA ++ = *a_i1_pntr++;
-    *packA ++ = *a_i2_pntr++;
-    *packA ++ = *a_i3_pntr++;
-    *packA ++ = *a_i4_pntr++;
-    *packA ++ = *a_i5_pntr++;
-    *packA ++ = *a_i6_pntr++;
-    *packA ++ = *a_i7_pntr++;
-  }
-  */
 }
 
 
@@ -230,46 +126,6 @@ inline void packB_kcxnc(
       *packB ++ = *b_pntr[ j ] ++;
     }
   }
-
-
-  /*
-  double *b_i0_pntr;
-  double *b_i1_pntr;
-  double *b_i2_pntr;
-  double *b_i3_pntr;
-
-  if ( n > 3 ) {
-    b_i0_pntr = XB + ldXB * bmap[ 0 ];
-    b_i1_pntr = XB + ldXB * bmap[ 1 ];
-    b_i2_pntr = XB + ldXB * bmap[ 2 ];
-    b_i3_pntr = XB + ldXB * bmap[ 3 ];
-  }
-  else if ( n > 2 ) {
-    b_i0_pntr = XB + ldXB * bmap[ 0 ];
-    b_i1_pntr = XB + ldXB * bmap[ 1 ];
-    b_i2_pntr = XB + ldXB * bmap[ 2 ];
-    b_i3_pntr = XB + ldXB * bmap[ 0 ];
-  }
-  else if ( n > 1 ) {
-    b_i0_pntr = XB + ldXB * bmap[ 0 ];
-    b_i1_pntr = XB + ldXB * bmap[ 1 ];
-    b_i2_pntr = XB + ldXB * bmap[ 0 ];
-    b_i3_pntr = XB + ldXB * bmap[ 0 ];
-  }
-  else {
-    b_i0_pntr = XB + ldXB * bmap[ 0 ];
-    b_i1_pntr = XB + ldXB * bmap[ 0 ];
-    b_i2_pntr = XB + ldXB * bmap[ 0 ];
-    b_i3_pntr = XB + ldXB * bmap[ 0 ];
-  }
-
-  for ( p = 0; p < k; p ++ ) {
-    *packB ++ = *b_i0_pntr++;
-    *packB ++ = *b_i1_pntr++;
-    *packB ++ = *b_i2_pntr++;
-    *packB ++ = *b_i3_pntr++;
-  }
-  */
 }
 
 
@@ -400,8 +256,6 @@ void rank_k_macro_kernel(
         aux.b_next += DKS_NR * k;
       }
 
-      //ks_rank_k_int_d8x4(
-      //ks_rank_k_asm_d8x4(
       ( *rankk ) (
           k,
           &packA[ i * k ],

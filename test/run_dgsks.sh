@@ -18,11 +18,11 @@ export DYLD_LIBRARY_PATH=${DYLD_LIBRARY_PATH}:/opt/intel/lib:${KS_MKL_DIR}/lib
 #done
 
 
-m=4096
-n=4096
+m=4097
+n=4097
 
 echo 'd_mn2048_gaussian = ['
-for (( k=4; k<1028; k+=4 ))
+for (( k=3; k<1028; k+=1 ))
 do
   ./test_dgsks.x $m $n $k
 done
