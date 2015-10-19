@@ -1,7 +1,9 @@
 // begin ks_kernel_summation_int_d8x4
 
-  rhs      = rhs / 2;
   rhs_left = rhs % 2;
+  rhs      = rhs / 2;
+
+  //printf( "rhs: %d, rhs_left: %d\n", rhs, rhs_left );
 
   for ( i = 0; i < rhs; i ++ ) {
     A03.v    = _mm256_load_pd( u +  8 );

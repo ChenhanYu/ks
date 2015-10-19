@@ -22,4 +22,6 @@ export KS_IC_NT=1
 
 
 # Add search paths.
+export PATH=${PATH}:/opt/intel/bin
 export DYLD_LIBRARY_PATH=${DYLD_LIBRARY_PATH}:/opt/intel/lib:${KS_MKL_DIR}/lib
+echo "DYLD_LIBRARY_PATH = ${DYLD_LIBRARY_PATH}"

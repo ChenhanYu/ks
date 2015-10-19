@@ -199,8 +199,8 @@ void test_dgsks(
   // ------------------------------------------------------------------------
   // Test Gaussian Kernel
   // ------------------------------------------------------------------------
-  //kernel.type = KS_GAUSSIAN;
-  //kernel.scal = -0.5;
+  kernel.type = KS_GAUSSIAN;
+  kernel.scal = -0.5;
   //kernel.scal = -1.0 * 0.16 * 0.16;
   //kernel.scal = -5000.0;
   // ------------------------------------------------------------------------
@@ -209,14 +209,14 @@ void test_dgsks(
   // ------------------------------------------------------------------------
   // Test Variable Bandwidth Gaussian Kernel
   // ------------------------------------------------------------------------
-  kernel.type = KS_GAUSSIAN_VAR_BANDWIDTH;
-  kernel.h = malloc( sizeof(double) * nx );
-  for ( i = 0; i < nx; i ++ ) {
-    //kernel.h[ i ] = -0.5;
-    //kernel.h[ i ] = ( -0.5 * i ) / 1000.0 ;
-    kernel.h[ i ] = ( 1.0 + 0.5 / ( 1 + exp( -1.0 * XA2[ i ] ) ) );
-    kernel.h[ i ] = -1.0 / ( 2.0 * kernel.h[ i ] * kernel.h[ i ] );
-  }
+  //kernel.type = KS_GAUSSIAN_VAR_BANDWIDTH;
+  //kernel.h = malloc( sizeof(double) * nx );
+  //for ( i = 0; i < nx; i ++ ) {
+  //  //kernel.h[ i ] = -0.5;
+  //  //kernel.h[ i ] = ( -0.5 * i ) / 1000.0 ;
+  //  kernel.h[ i ] = ( 1.0 + 0.5 / ( 1 + exp( -1.0 * XA2[ i ] ) ) );
+  //  kernel.h[ i ] = -1.0 / ( 2.0 * kernel.h[ i ] * kernel.h[ i ] );
+  //}
   // ------------------------------------------------------------------------
 
 

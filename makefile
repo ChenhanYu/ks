@@ -1,4 +1,4 @@
-include $(KS_DIR)/make.inc
+include $(KS_DIR)/make.osx.inc
 
 FRAME_CC_SRC=     \
 								  frame/dgsks.c \
