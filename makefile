@@ -25,8 +25,10 @@ KERNEL_SRC=       \
 								  micro_kernel/$(KS_ARCH)/ks_epanechnikov_int_d8x4.c \
 									\
 								  micro_kernel/$(KS_ARCH)/ks_multiquadratic_int_d8x4.c \
+								  micro_kernel/$(KS_ARCH)/ks_multiquadratic_int_d12x4.c \
 									\
 								  micro_kernel/$(KS_ARCH)/ks_rank_k_int_d8x4.c \
+								  micro_kernel/$(KS_ARCH)/ks_rank_k_int_d12x4.c \
 								  micro_kernel/$(KS_ARCH)/ks_rank_k_asm_d8x4.c \
 	
 FRAME_MIC_CC_SRC= \
