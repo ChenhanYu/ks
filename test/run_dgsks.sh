@@ -22,7 +22,7 @@ m=4097
 n=4097
 
 echo 'd_mn2048_gaussian = ['
-for (( k=4; k<1028; k+=16 ))
+for (( k=4; k<1028; k+=31 ))
 do
   ./test_dgsks.x $m $n $k
 done
