@@ -1,4 +1,4 @@
-.. image:: https://github.com/ChenhanYu/ks/blob/master/logo/gsks_logo.001.png
+.. image:: https://github.com/ChenhanYu/ks/blob/master/logo/gsks_logo.png
   :alt: ks logo
   :align: center
 
