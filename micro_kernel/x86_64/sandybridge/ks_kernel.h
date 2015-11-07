@@ -165,8 +165,8 @@ void (*micro[ 8 ]) (
     ks_t   *ker,
     aux_t  *aux
     ) = { 
-  //ks_gaussian_int_d8x4,
-  ks_gaussian_svml_d8x4,
+  ks_gaussian_int_d8x4,
+  //ks_gaussian_svml_d8x4,
   ks_polynomial_int_d8x4,
   ks_laplace3d_int_d8x4,
   ks_variable_bandwidth_gaussian_int_d8x4,

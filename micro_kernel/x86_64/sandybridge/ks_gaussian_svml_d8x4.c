@@ -1,4 +1,5 @@
 #include <immintrin.h> // AVX
+#include <math.h>
 #include <ks.h>
 
 
@@ -136,6 +137,7 @@ void ks_gaussian_svml_d8x4(
 
 
   // c = exp( c )
+#ifdef USE_VML
   c03_0.v       = _mm256_exp_pd( c03_0.v );
   c03_1.v       = _mm256_exp_pd( c03_1.v );
   c03_2.v       = _mm256_exp_pd( c03_2.v );
@@ -145,6 +147,40 @@ void ks_gaussian_svml_d8x4(
   c47_1.v       = _mm256_exp_pd( c47_1.v );
   c47_2.v       = _mm256_exp_pd( c47_2.v );
   c47_3.v       = _mm256_exp_pd( c47_3.v );
+#else
+  c03_0.d[ 0 ] = exp( c03_0.d[ 0 ] );
+  c03_0.d[ 1 ] = exp( c03_0.d[ 1 ] );
+  c03_0.d[ 2 ] = exp( c03_0.d[ 2 ] );
+  c03_0.d[ 3 ] = exp( c03_0.d[ 3 ] );
+  c03_1.d[ 0 ] = exp( c03_1.d[ 0 ] );
+  c03_1.d[ 1 ] = exp( c03_1.d[ 1 ] );
+  c03_1.d[ 2 ] = exp( c03_1.d[ 2 ] );
+  c03_1.d[ 3 ] = exp( c03_1.d[ 3 ] );
+  c03_2.d[ 0 ] = exp( c03_2.d[ 0 ] );
+  c03_2.d[ 1 ] = exp( c03_2.d[ 1 ] );
+  c03_2.d[ 2 ] = exp( c03_2.d[ 2 ] );
+  c03_2.d[ 3 ] = exp( c03_2.d[ 3 ] );
+  c03_3.d[ 0 ] = exp( c03_3.d[ 0 ] );
+  c03_3.d[ 1 ] = exp( c03_3.d[ 1 ] );
+  c03_3.d[ 2 ] = exp( c03_3.d[ 2 ] );
+  c03_3.d[ 3 ] = exp( c03_3.d[ 3 ] );
+  c47_0.d[ 0 ] = exp( c47_0.d[ 0 ] );
+  c47_0.d[ 1 ] = exp( c47_0.d[ 1 ] );
+  c47_0.d[ 2 ] = exp( c47_0.d[ 2 ] );
+  c47_0.d[ 3 ] = exp( c47_0.d[ 3 ] );
+  c47_1.d[ 0 ] = exp( c47_1.d[ 0 ] );
+  c47_1.d[ 1 ] = exp( c47_1.d[ 1 ] );
+  c47_1.d[ 2 ] = exp( c47_1.d[ 2 ] );
+  c47_1.d[ 3 ] = exp( c47_1.d[ 3 ] );
+  c47_2.d[ 0 ] = exp( c47_2.d[ 0 ] );
+  c47_2.d[ 1 ] = exp( c47_2.d[ 1 ] );
+  c47_2.d[ 2 ] = exp( c47_2.d[ 2 ] );
+  c47_2.d[ 3 ] = exp( c47_2.d[ 3 ] );
+  c47_3.d[ 0 ] = exp( c47_3.d[ 0 ] );
+  c47_3.d[ 1 ] = exp( c47_3.d[ 1 ] );
+  c47_3.d[ 2 ] = exp( c47_3.d[ 2 ] );
+  c47_3.d[ 3 ] = exp( c47_3.d[ 3 ] );
+#endif
 
 
   // Multiple rhs kernel summation.

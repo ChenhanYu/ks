@@ -45,8 +45,24 @@
  * */
 
 #include <omp.h>
-#include <mkl.h>
+#include <math.h>
 #include <ks.h>
+
+#ifdef USE_VML
+#include <mkl.h>
+#endif
+
+#ifdef USE_BLAS
+/*
+ * dgemm and sgemm prototypes
+ *
+ */
+void dgemm(char*, char*, int*, int*, int*, double*, double*,
+    int*, double*, int*, double*, double*, int*);
+void sgemm(char*, char*, int*, int*, int*, float*, float*,
+    int*, float*, int*, float*, float*, int*);
+#endif
+
 
 
 /* 
@@ -86,40 +102,32 @@ void dgsks_ref(
     int    *omega
     )
 {
-  int    i, j, p;
-  int    pack_bandwidth;
+  int    i, j, p, nrhs = KS_RHS;
   double *As, *Bs, *Cs, *us, *ws, *hs, *powe;
-  double rank_k_scale;
-
+  double rank_k_scale, fone = 1.0, fzero = 0.0;
   double beg, tcollect, tgemm, tgemv, tkernel;
 
 
   beg = omp_get_wtime();
-
   // ------------------------------------------------------------------------
   // Setup kernel dependent parameters
   // ------------------------------------------------------------------------
   switch ( kernel->type ) {
     case KS_GAUSSIAN:
-      pack_bandwidth = 0;
       rank_k_scale = -2.0;
       break;
     case KS_GAUSSIAN_VAR_BANDWIDTH:
-      pack_bandwidth = 1;
       rank_k_scale = -2.0;
       if ( !kernel->h ) {
         printf( "Error dgsks(): bandwidth vector has been initialized yet.\n" );
       }
-      //kernel->packh = (double*)malloc( sizeof(double) * n );
       break;
     case KS_POLYNOMIAL:
-      pack_bandwidth = 0;
       rank_k_scale = 1.0;
       powe = (double*)malloc( sizeof(double) * m * n );
       for ( i = 0; i < m * n; i++ ) powe[ i ] = kernel->powe;
       break;
     case KS_LAPLACE:
-      pack_bandwidth = 0;
       rank_k_scale = -2.0;
       if ( k < 3 ) {
         printf( "Error dgsks(): laplace kernel only supports k > 2.\n" );
@@ -132,19 +140,15 @@ void dgsks_ref(
       //printf( "powe = %lf, scal = %lf\n", kernel->powe, kernel->scal );
       break;
     case KS_TANH:
-      pack_bandwidth = 0;
       rank_k_scale = 1.0;
       break;
     case KS_QUARTIC:
-      pack_bandwidth = 0;
       rank_k_scale = -2.0;
       break;
     case KS_MULTIQUADRATIC:
-      pack_bandwidth = 0;
       rank_k_scale = -2.0;
       break;
     case KS_EPANECHNIKOV:
-      pack_bandwidth = 0;
       rank_k_scale = -2.0;
       break;
     default:
@@ -191,7 +195,7 @@ void dgsks_ref(
     }
     for ( p = 0; p < KS_RHS; p ++ ) {
       ws[ p * n + j ] = w[ omega[ j ] * KS_RHS + p ];
-    }
+    }    
   }
   // ------------------------------------------------------------------------
   tcollect = omp_get_wtime() - beg;
@@ -202,22 +206,26 @@ void dgsks_ref(
   // ------------------------------------------------------------------------
   // C = -2.0 * A^t * B (GEMM)
   // ------------------------------------------------------------------------
-  cblas_dgemm(
-      CblasColMajor,
-      CblasTrans,
-      CblasNoTrans,
-      m,
-      n,
-      k,
-      rank_k_scale,
-      As,
-      k,
-      Bs,
-      k,
-      0.0,
-      Cs,
-      m
-      );
+#ifdef USE_BLAS
+  dgemm( "T", "N", &m, &n, &k, &rank_k_scale, 
+      As, &k, Bs, &k, &fzero, Cs, &m );
+#else
+  #pragma omp parallel for private( i, p )
+  for ( j = 0; j < n; j ++ ) {
+    for ( i = 0; i < m; i ++ ) {
+      Cs[ j * m + i ] = 0.0;
+      for ( p = 0; p < k; p ++ ) {
+        Cs[ j * m + i ] += As[ i * k + p ] * Bs[ j * k + p ];
+      }
+    }
+  }
+  #pragma omp parallel for private( i )
+  for ( j = 0; j < n; j ++ ) {
+    for ( i = 0; i < m; i ++ ) {
+      Cs[ j * m + i ] *= rank_k_scale;
+    }
+  }
+#endif
   // ------------------------------------------------------------------------
   tgemm = omp_get_wtime() - beg;
 
@@ -235,9 +243,14 @@ void dgsks_ref(
           Cs[ j * m + i ] += XB2[ beta[ j ] ];
           Cs[ j * m + i ] *= kernel->scal;
         }
+#ifdef USE_VML
         vdExp( m, Cs + j * m, Cs + j * m );
+#else
+        for ( i = 0; i < m; i ++ ) {
+          Cs[ j * m + i ] = exp( Cs[ j * m + i ] );
+        }
+#endif
       }
-      //vdExp( m * n, Cs, Cs );
       break;
     case KS_GAUSSIAN_VAR_BANDWIDTH:
       #pragma omp parallel for private( i )
@@ -247,9 +260,14 @@ void dgsks_ref(
           Cs[ j * m + i ] += XB2[ beta[ j ] ];
           Cs[ j * m + i ] *= kernel->h[ beta[ j ] ];
         }
+#ifdef USE_VML
         vdExp( m, Cs + j * m, Cs + j * m );
+#else
+        for ( i = 0; i < m; i ++ ) {
+          Cs[ j * m + i ] = exp( Cs[ j * m + i ] );
+        }
+#endif
       }
-      //vdExp( m * n, Cs, Cs );
       break;
     case KS_POLYNOMIAL:
       if ( kernel->powe == 2.0 ) {
@@ -274,9 +292,19 @@ void dgsks_ref(
         }
       }
       else {
-        #pragma omp parallel for
+        #pragma omp parallel for private( i )
         for ( j = 0; j < n; j ++ ) {
+          for ( i = 0; i < m; i ++ ) {
+            Cs[ j * m + i ] *= kernel->scal;
+            Cs[ j * m + i ] += kernel->cons;
+          }
+#ifdef USE_VML
           vdPow( m, Cs + j * m, powe, Cs + j * m );
+#else
+          for ( i = 0; i < m; i ++ ) {
+            Cs[ j * m + i ] = pow( Cs[ j * m + i ], kernel->powe );
+          }
+#endif
         }
       }
       break;
@@ -290,8 +318,14 @@ void dgsks_ref(
             Cs[ j * m + i ] = 1.79E+308;
           }
         }
+#ifdef USE_VML
+        vdPow( m, Cs + j * m, powe, Cs + j * m );
+#else
+        for ( i = 0; i < m; i ++ ) {
+          Cs[ j * m + i ] = pow( Cs[ j * m + i ], kernel->powe );
+        }
+#endif
       }
-      vdPow( m * n, Cs, powe, Cs );
       #pragma omp parallel for private( i )
       for ( j = 0; j < n; j ++ ) {
         for ( i = 0; i < m; i ++ ) {
@@ -306,7 +340,13 @@ void dgsks_ref(
           Cs[ j * m + i ] *= kernel->scal;
           Cs[ j * m + i ] += kernel->cons;
         }
+#ifdef USE_VML
         vdTanh( m, Cs + j * m, Cs + j * m );
+#else
+        for ( i = 0; i < m; i ++ ) {
+          Cs[ j * m + i ] = tanh( Cs[ j * m + i ] );
+        }
+#endif
       }
       //vdTanh( m * n, Cs, Cs );
       break;
@@ -362,38 +402,21 @@ void dgsks_ref(
 
   beg = omp_get_wtime();
   // ------------------------------------------------------------------------
-  // Kernel Summation (GEMV)
+  // Kernel Summation
   // ------------------------------------------------------------------------
-  //cblas_dgemv(
-  //    CblasColMajor,
-  //    CblasNoTrans,
-  //    m,
-  //    n,
-  //    1.0,
-  //    Cs,
-  //    m,
-  //    ws,
-  //    1,
-  //    1.0,
-  //    us,
-  //    1
-  //    );
-  cblas_dgemm(
-      CblasColMajor,
-      CblasNoTrans,
-      CblasNoTrans,
-      m,
-      KS_RHS,
-      n,
-      1.0,
-      Cs,
-      m,
-      ws,
-      n,
-      1.0,
-      us,
-      m
-      );
+#ifdef USE_BLAS
+  dgemm( "N", "N", &m, &nrhs, &n, &fone, 
+      Cs, &m, ws, &n, &fone, us, &m );
+#else
+  #pragma omp parallel for private( j, p )
+  for ( i = 0; i < m; i ++ ) {
+    for ( j = 0; j < nrhs; j ++ ) {
+      for ( p = 0; p < n; p ++ ) {
+        us[ j * m + i ] += Cs[ p * m + i ] * ws[ j * n + p ];
+      }
+    }
+  }
+#endif
   // ------------------------------------------------------------------------
   tgemv = omp_get_wtime() - beg;
 
@@ -451,7 +474,6 @@ void dgsks_ref(
     case KS_GAUSSIAN:
       break;
     case KS_GAUSSIAN_VAR_BANDWIDTH:
-      //free( kernel->packh );
       break;
     case KS_POLYNOMIAL:
       free( powe );

@@ -1,4 +1,5 @@
 #!/bin/bash
+export DYLD_LIBRARY_PATH=${DYLD_LIBRARY_PATH}:/opt/intel/lib:${KS_MKL_DIR}/lib
 
 #n=512
 #k=288

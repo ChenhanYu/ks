@@ -141,6 +141,9 @@ void ks_variable_bandwidth_gaussian_int_d8x4(
   u03.v    = _mm256_load_pd( (double*)u );
   u47.v    = _mm256_load_pd( (double*)( u + 4 ) );
 
+  //printf( "w: %lf, %lf, %lf, %lf\n", w[ 0 ], w[ 1 ], w[ 2 ], w[ 3 ] );
+  //printf( "u: %lf, %lf, %lf, %lf, %lf, %lf, %lf, %lf\n", 
+  //    u[ 0 ], u[ 1 ], u[ 2 ], u[ 3 ], u[ 4 ], u[ 5 ], u[ 6 ], u[ 7 ] );
 
   // Prefetch u and w
   __asm__ volatile( "prefetcht0 0(%0)    \n\t" : :"r"( u + 8 ) );
@@ -149,6 +152,16 @@ void ks_variable_bandwidth_gaussian_int_d8x4(
 
   // c = exp( c );
   #include "ks_exp_int_d8x4.h"
+
+
+  //printf( "%lf, %lf, %lf, %lf\n", c03_0.d[0], c03_1.d[0], c03_2.d[0], c03_3.d[0] );
+  //printf( "%lf, %lf, %lf, %lf\n", c03_0.d[1], c03_1.d[1], c03_2.d[1], c03_3.d[1] );
+  //printf( "%lf, %lf, %lf, %lf\n", c03_0.d[2], c03_1.d[2], c03_2.d[2], c03_3.d[2] );
+  //printf( "%lf, %lf, %lf, %lf\n", c03_0.d[3], c03_1.d[3], c03_2.d[3], c03_3.d[3] );
+  //printf( "%lf, %lf, %lf, %lf\n", c47_0.d[0], c47_1.d[0], c47_2.d[0], c47_3.d[0] );
+  //printf( "%lf, %lf, %lf, %lf\n", c47_0.d[1], c47_1.d[1], c47_2.d[1], c47_3.d[1] );
+  //printf( "%lf, %lf, %lf, %lf\n", c47_0.d[2], c47_1.d[2], c47_2.d[2], c47_3.d[2] );
+  //printf( "%lf, %lf, %lf, %lf\n", c47_0.d[3], c47_1.d[3], c47_2.d[3], c47_3.d[3] );
 
 
   // Multiple rhs kernel summation.

@@ -224,7 +224,7 @@ void test_dgsks(
   // Test Polynomial Kernel
   // ------------------------------------------------------------------------
   //kernel.type = KS_POLYNOMIAL;
-  //kernel.powe = 4.0;
+  //kernel.powe = 3.0;
   //kernel.scal = 0.1;
   //kernel.cons = 0.1;
   // ------------------------------------------------------------------------

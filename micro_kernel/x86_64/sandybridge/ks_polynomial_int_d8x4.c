@@ -140,6 +140,7 @@ void ks_polynomial_int_d8x4(
     c47_3.v   = _mm256_mul_pd( c47_3.v, c47_3.v );
   }
   else {
+#ifdef USE_VML    
     c_tmp.v   = _mm256_broadcast_sd( &powe );
     c03_0.v   = _mm256_pow_pd( c03_0.v, c_tmp.v ); 
     c03_1.v   = _mm256_pow_pd( c03_1.v, c_tmp.v ); 
@@ -149,6 +150,40 @@ void ks_polynomial_int_d8x4(
     c47_1.v   = _mm256_pow_pd( c47_1.v, c_tmp.v ); 
     c47_2.v   = _mm256_pow_pd( c47_2.v, c_tmp.v ); 
     c47_3.v   = _mm256_pow_pd( c47_3.v, c_tmp.v );
+#else
+    c03_0.d[ 0 ] = pow( c03_0.d[ 0 ], powe );
+    c03_0.d[ 1 ] = pow( c03_0.d[ 1 ], powe );
+    c03_0.d[ 2 ] = pow( c03_0.d[ 2 ], powe );
+    c03_0.d[ 3 ] = pow( c03_0.d[ 3 ], powe );
+    c03_1.d[ 0 ] = pow( c03_1.d[ 0 ], powe );
+    c03_1.d[ 1 ] = pow( c03_1.d[ 1 ], powe );
+    c03_1.d[ 2 ] = pow( c03_1.d[ 2 ], powe );
+    c03_1.d[ 3 ] = pow( c03_1.d[ 3 ], powe );
+    c03_2.d[ 0 ] = pow( c03_2.d[ 0 ], powe );
+    c03_2.d[ 1 ] = pow( c03_2.d[ 1 ], powe );
+    c03_2.d[ 2 ] = pow( c03_2.d[ 2 ], powe );
+    c03_2.d[ 3 ] = pow( c03_2.d[ 3 ], powe );
+    c03_3.d[ 0 ] = pow( c03_3.d[ 0 ], powe );
+    c03_3.d[ 1 ] = pow( c03_3.d[ 1 ], powe );
+    c03_3.d[ 2 ] = pow( c03_3.d[ 2 ], powe );
+    c03_3.d[ 3 ] = pow( c03_3.d[ 3 ], powe );
+    c47_0.d[ 0 ] = pow( c47_0.d[ 0 ], powe );
+    c47_0.d[ 1 ] = pow( c47_0.d[ 1 ], powe );
+    c47_0.d[ 2 ] = pow( c47_0.d[ 2 ], powe );
+    c47_0.d[ 3 ] = pow( c47_0.d[ 3 ], powe );
+    c47_1.d[ 0 ] = pow( c47_1.d[ 0 ], powe );
+    c47_1.d[ 1 ] = pow( c47_1.d[ 1 ], powe );
+    c47_1.d[ 2 ] = pow( c47_1.d[ 2 ], powe );
+    c47_1.d[ 3 ] = pow( c47_1.d[ 3 ], powe );
+    c47_2.d[ 0 ] = pow( c47_2.d[ 0 ], powe );
+    c47_2.d[ 1 ] = pow( c47_2.d[ 1 ], powe );
+    c47_2.d[ 2 ] = pow( c47_2.d[ 2 ], powe );
+    c47_2.d[ 3 ] = pow( c47_2.d[ 3 ], powe );
+    c47_3.d[ 0 ] = pow( c47_3.d[ 0 ], powe );
+    c47_3.d[ 1 ] = pow( c47_3.d[ 1 ], powe );
+    c47_3.d[ 2 ] = pow( c47_3.d[ 2 ], powe );
+    c47_3.d[ 3 ] = pow( c47_3.d[ 3 ], powe );
+#endif
   }
  
 

@@ -18,6 +18,9 @@ export DYLD_LIBRARY_PATH=${DYLD_LIBRARY_PATH}:/opt/intel/lib:${KS_MKL_DIR}/lib
 #done
 
 
+
+#./test_dgsks.x 8 4 1
+
 m=4097
 n=4097
 
@@ -26,6 +29,13 @@ for (( k=4; k<1028; k+=31 ))
 do
   ./test_dgsks.x $m $n $k
 done
+
+
+
+
+
+
+
 
 
 #m=4096
