@@ -1,18 +1,32 @@
 #!/bin/bash
-export KS_DIR=$PWD
-echo "KS_DIR = $KS_DIR"
+export GSKS_DIR=$PWD
+echo "GSKS_DIR = $GSKS_DIR"
 
 # Manually set the target architecture.
-export KS_ARCH_MAJOR=x86_64
-export KS_ARCH_MINOR=sandybridge
-export KS_ARCH = $KS_ARCH_MAJOR/$KS_ARCH_MINOR
-echo "KS_ARCH = $KS_ARCH"
+export GSKS_ARCH_MAJOR=x86_64
+export GSKS_ARCH_MINOR=sandybridge
+export GSKS_ARCH=$GSKS_ARCH_MAJOR/$GSKS_ARCH_MINOR
+echo "GSKS_ARCH = $GSKS_ARCH"
+
+# Compiler options (if false, then use GNU compilers)
+export GSKS_USE_INTEL=false
+echo "GSKS_USE_INTEL = $GSKS_USE_INTEL"
+
+# Whether use BLAS or not?
+export GSKS_USE_BLAS=false
+echo "GSKS_USE_BLAS = $GSKS_USE_BLAS"
+
+#Whether use VML or not? (only if you have MKL)
+export GSKS_USE_VML=false
+echo "GSKS_USE_VML = $GSKS_USE_VML"
+
 
 # Manually set the mkl path
-export KS_MKL_DIR=/opt/intel/mkl
-echo "KS_MKL_DIR = $KS_MKL_DIR"
+export GSKS_MKL_DIR=$TACC_MKL_DIR
+# export GSKS_MKL_DIR=/opt/intel/mkl
+echo "GSKS_MKL_DIR = $GSKS_MKL_DIR"
 
 # Parallel options
 export KMP_AFFINITY=compact
-export OMP_NUM_THREADS=1
-export KS_IC_NT=1
+export OMP_NUM_THREADS=10
+export KS_IC_NT=10

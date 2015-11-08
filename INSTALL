@@ -3,21 +3,32 @@ GSKS (General Stride Kernel Summation)
 INSTALL
 ---
 
-GSKS is tested on LINUX and OSX
-REQUIRES Intel compilers and MKL. 
+GSKS is tested on LINUX and OSX.
+Compilation REQUIRES Intel or GNU compilers with AVX and OpenMP support.
 
-LINUX:
-edit  set_env.sh and make.inc to set the paths to the libraries. 
 
-OSX: 
-edit  set_env_osx.sh and make.osx.inc to set the paths to the libraries. 
-edit the first line in makefile to change make.inc to make.osx.inc 
+Configuration:
+--------------
 
-For LINUX (and similarly for OSX), to use the standard makefil:
+Edit set_env.sh for compilation options.
+
+Set GSKS_USE_INTEL = true  to use Intel compilers (make.intel.inc).
+Set GSKS_USE_INTEL = false to use GNU compilers   (make.gnu.inc).
+Set GSKS_USE_BLAS  = false if you don't have a BLAS library.
+Set GSKS_USE_BLAS  = true  to activate Intel VML.
+
+The default BLAS library for Intel compiler is MKL, and the
+default BLAS for GNU is Netlib (-lblas).
+
+
+Installation:
+-------------
+
+Use the standard makefile:
 >source set_env.sh
 >make
 
-For LINUX (and similarly for OSX), to use cmake:
+Use cmake:
 >source set_env.sh
 >mkdir build
 >cd build
@@ -25,28 +36,27 @@ For LINUX (and similarly for OSX), to use cmake:
 >make
 >make install
 
-GSKS requires c and c++ compilers that support OpenMP, and the
-default micro-kernel (uses AVX) requires the a Sandy-Bridge
-processor or any successor. 
 
-The current reference function requires the support of the MKL
-library which will be changed in the future. The default 
-compilation will also compile all the test drivers. To run
-some basic example from the testing drivers:
+Testing and compilation example:
+--------------------------------
+
+The default compilation will also compile all the test drivers.
+To run some basic examples from the testing drivers:
 
 >cd test
 >./run_dgsks.sh
 >./run_dgsks_list.sh
 
+
 To us GSKS library you need to include the
-header files <ks.h> and <omp_dgsks_list.h> 
-and link GSKS statically wich is in ${KS_DIR}/lib/libks.a.
+header files <gsks.h> and <omp_dgsks_list.h> 
+and link GSKS statically wich is in ${KS_DIR}/lib/libgsks.a.
 
 C/C++ example:
 ...
-#include <ks.h>
+#include <gsks.h>
 #include <omp_dgsks_list.h>
 ...
 
 Compilation example:
->icc ... -I$(KS_DIR)/include $(KS_DIR)/lib/libks.a
+>icc ... -I$(KS_DIR)/include $(KS_DIR)/lib/libgsks.a

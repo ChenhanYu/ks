@@ -26,6 +26,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <omp.h>
+#include <math.h>
 #include <ks.h>
 
 void compute_error(
@@ -42,6 +43,7 @@ void compute_error(
   max_idx = -1;
   max_err = 0.0;
   nrm2    = 0.0;
+  rel_err = 0.0;
 
   for ( i = 0; i < m; i ++ ) {
     for ( p = 0; p < rhs; p ++ ) {

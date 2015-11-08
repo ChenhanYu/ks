@@ -53,6 +53,7 @@
 #endif
 
 #ifdef USE_BLAS
+#ifndef USE_VML
 /*
  * dgemm and sgemm prototypes
  *
@@ -61,6 +62,7 @@ void dgemm(char*, char*, int*, int*, int*, double*, double*,
     int*, double*, int*, double*, double*, int*);
 void sgemm(char*, char*, int*, int*, int*, float*, float*,
     int*, float*, int*, float*, float*, int*);
+#endif
 #endif
 
 
@@ -268,6 +270,12 @@ void dgsks_ref(
         }
 #endif
       }
+      //for ( j = 0; j < n; j ++ ) {
+      //  for ( i = 0; i < m; i ++ ) {
+      //    printf( "%lf ", Cs[ j * m + i ] );
+      //  }
+      //  printf( "\n" );
+      //}
       break;
     case KS_POLYNOMIAL:
       if ( kernel->powe == 2.0 ) {

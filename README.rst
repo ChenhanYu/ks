@@ -21,6 +21,8 @@ on the BLIS framework.
 GSKS has several features. For further details of this project, please
 check the Githup repo:
 
+github.com/ChenhanYu/ks
+
 Thank you again for being intersted in GSKS!
 
 Best regards,

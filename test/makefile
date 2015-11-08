@@ -1,14 +1,18 @@
-include $(KS_DIR)/make.inc
+ifeq ($(GSKS_USE_INTEL),true)
+include $(GSKS_DIR)/make.intel.inc
+else
+include $(GSKS_DIR)/make.gnu.inc
+endif
 
-KS_TEST_CC_SRC=  \
+TEST_CC_SRC=  \
                  test_dgsks.c \
 
-KS_TEST_CPP_SRC= \
+TEST_CPP_SRC= \
                  test_dgsks_list.cpp \
 
-KS_TEST_EXE= $(KS_TEST_CC_SRC:.c=.x) $(KS_TEST_CPP_SRC:.cpp=.x)
+TEST_EXE= $(TEST_CC_SRC:.c=.x) $(TEST_CPP_SRC:.cpp=.x)
 
-all: $(KS_TEST_EXE)
+all: $(TEST_EXE)
 
 
 # ---------------------------------------------------------------------------
@@ -18,8 +22,8 @@ all: $(KS_TEST_EXE)
 	$(CC) $(CFLAGS) $< -o $@ $(LDFLAGS) $(LDLIBS)
 
 %.x: %.cpp 
-	$(CXX) $(CXXFLAGS) $< -o $@ $(LDFLAGS) $(LDLIBS)
+	$(CXX) $(CFLAGS) $< -o $@ $(LDFLAGS) $(LDLIBS)
 # ---------------------------------------------------------------------------
 
 clean:
-	rm -f $(KS_TEST_EXE)
+	rm -f $(TEST_EXE)
