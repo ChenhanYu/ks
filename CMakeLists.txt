@@ -3,11 +3,11 @@ cmake_minimum_required (VERSION 2.8)
 
 
 # Project specification.
-project (KS)
-set (KS_VERSION_MAJOR 1)
-set (KS_VERSION_MINOR 1)
-set (KS_VERSION_PATCH 0)
-set (KS_VERSION ${KS_VERSION_MAJOR}.${KS_VERSION_MINOR}.${KS_VERSION_PATCH})
+project (GSKS)
+set (GSKS_VERSION_MAJOR 1)
+set (GSKS_VERSION_MINOR 1)
+set (GSKS_VERSION_PATCH 0)
+set (GSKS_VERSION ${GSKS_VERSION_MAJOR}.${GSKS_VERSION_MINOR}.${GSKS_VERSION_PATCH})
 
 
 # Configure the path structure.
@@ -23,64 +23,87 @@ ENABLE_TESTING()
 
 
 # Decide architecture
-#set (KS_ARCH_MAJOR "x86_64")
-set (KS_ARCH_MAJOR $ENV{KS_ARCH_MAJOR})
-#set (KS_ARCH_MINOR "sandybridge")
-set (KS_ARCH_MINOR $ENV{KS_ARCH_MINOR})
-set (KS_ARCH ${KS_ARCH_MAJOR}/${KS_ARCH_MINOR})
+set (GSKS_ARCH_MAJOR $ENV{GSKS_ARCH_MAJOR})
+set (GSKS_ARCH_MINOR $ENV{GSKS_ARCH_MINOR})
+set (GSKS_ARCH ${GSKS_ARCH_MAJOR}/${GSKS_ARCH_MINOR})
 
 
-# Compiler Options (KS must use Intel compiler.)
-set (CMAKE_C_COMPILER   icc )
-set (CMAKE_CXX_COMPILER icpc)
-set (KS_CFLAGS          "-O3 -openmp -mavx -Werror -Wall -pedantic")
-set (CMAKE_C_FLAGS      "${CMAKE_C_FLAGS} ${KS_CFLAGS}")
-set (CMAKE_CXX_FLAGS    "${CMAKE_CXX_FLAGS} ${KS_CFLAGS}")
+# Compiler Options (GSKS can use Intel or GNU compilers.)
+if ($ENV{GSKS_USE_INTEL} MATCHES "true")
+  set (CMAKE_C_COMPILER   icc )
+  set (CMAKE_CXX_COMPILER icpc)
+  set (GSKS_CFLAGS          "-O3 -openmp -mavx -Werror -Wall -pedantic")
+  set (CMAKE_EXE_LINKER_FLAGS "-lpthread -openmp -lm")
+else ($ENV{GSKS_USE_INTEL} MATCHES "true")
+  set (CMAKE_C_COMPILER   gcc)
+  set (CMAKE_CXX_COMPILER g++)
+  set (GSKS_CFLAGS          "-O3 -fopenmp -mavx")
+  set (CMAKE_EXE_LINKER_FLAGS "-lpthread -fopenmp -lm")
+endif ($ENV{GSKS_USE_INTEL} MATCHES "true")
 
 
-# Software dependencies.
-#set (MKL_DIR /opt/intel/mkl)
-set (MKL_DIR $ENV{KS_MKL_DIR})
+if ($ENV{GSKS_USE_VML} MATCHES "true")
+  if ($ENV{GSKS_USE_INTEL} MATCHES "true")
+    set (GSKS_CFLAGS          "${GSKS_CFLAGS} -DUSE_VML")
+  endif ($ENV{GSKS_USE_INTEL} MATCHES "true")
+endif ($ENV{GSKS_USE_VML} MATCHES "true")
+
+
+if ($ENV{GSKS_USE_BLAS} MATCHES "true")
+  set (GSKS_CFLAGS          "${GSKS_CFLAGS} -DUSE_BLAS")
+endif ($ENV{GSKS_USE_BLAS} MATCHES "true")
+set (CMAKE_C_FLAGS      "${CMAKE_C_FLAGS} ${GSKS_CFLAGS}")
+set (CMAKE_CXX_FLAGS    "${CMAKE_CXX_FLAGS} ${GSKS_CFLAGS}")
 
 
 # Linking infos.
-set (CMAKE_EXE_LINKER_FLAGS "-lpthread -lm -mkl=parallel")
+if (($ENV{GSKS_USE_BLAS} MATCHES "true") OR ($ENV{GSKS_USE_VML} MATCHES "true"))
+  if ($ENV{GSKS_USE_INTEL} MATCHES "true")
+    set (CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -mkl=parallel")
+  else ($ENV{GSKS_USE_INTEL} MATCHES "true")
+    set (CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -lblas")
+  endif ($ENV{GSKS_USE_INTEL} MATCHES "true")
+endif (($ENV{GSKS_USE_BLAS} MATCHES "true") OR ($ENV{GSKS_USE_VML} MATCHES "true"))
+
+
+# Software dependencies.
+set (MKL_DIR $ENV{GSKS_MKL_DIR})
 
 
 # Headers.
-include_directories ("include" "${MKL_DIR}/include")
-file (GLOB KS_HDRS ${CMAKE_SOURCE_DIR}/include/*)
-install (FILES ${KS_HDRS} DESTINATION ${CMAKE_BINARY_DIR}/include)
+include_directories ("include" "${CMAKE_SOURCE_DIR}/micro_kernel/${GSKS_ARCH}" "${MKL_DIR}/include")
+file (GLOB GSKS_HDRS ${CMAKE_SOURCE_DIR}/include/*)
+install (FILES ${GSKS_HDRS} DESTINATION ${CMAKE_BINARY_DIR}/include)
 
 
 # Library dependencies
 file (GLOB FRAME_CC_SRC  ${CMAKE_SOURCE_DIR}/frame/*.c)
 file (GLOB FRAME_CXX_SRC ${CMAKE_SOURCE_DIR}/frame/*.cpp)
-file (GLOB KERNEL_SRC ${CMAKE_SOURCE_DIR}/micro_kernel/${KS_ARCH}/*.c)
+file (GLOB KERNEL_SRC ${CMAKE_SOURCE_DIR}/micro_kernel/${GSKS_ARCH}/*.c)
 
 
 # Build the static library.
-add_library (ks ${FRAME_CC_SRC} ${FRAME_CXX_SRC} ${KERNEL_SRC})
+add_library (gsks ${FRAME_CC_SRC} ${FRAME_CXX_SRC} ${KERNEL_SRC})
 
 
 # Build the executable files.
 add_executable (test_dgsks.x ${CMAKE_SOURCE_DIR}/test/test_dgsks.c)
-target_link_libraries(test_dgsks.x ks)
+target_link_libraries(test_dgsks.x gsks)
 add_executable (test_dgsks_list.x ${CMAKE_SOURCE_DIR}/test/test_dgsks_list.cpp)
-target_link_libraries(test_dgsks_list.x ks)
+target_link_libraries(test_dgsks_list.x gsks)
 
 
 # Install shell script
-file (GLOB KS_SCRIPTS ${CMAKE_SOURCE_DIR}/test/*.sh)
-install (FILES ${KS_SCRIPTS} DESTINATION ${CMAKE_BINARY_DIR}/bin)
+file (GLOB GSKS_SCRIPTS ${CMAKE_SOURCE_DIR}/test/*.sh)
+install (FILES ${GSKS_SCRIPTS} DESTINATION ${CMAKE_BINARY_DIR}/bin)
 
 
 # Report
 message ("===================================================")
-message ("Version      =${KS_VERSION}")
+message ("Version      =${GSKS_VERSION}")
 message ("Source       =${CMAKE_SOURCE_DIR}")
 message ("Target       =${CMAKE_BINARY_DIR}")
-message ("KS_ARCH      =${KS_ARCH}")
+message ("GSKS_ARCH    =${GSKS_ARCH}")
 message ("CC           =${CMAKE_C_COMPILER}")
 message ("CFLAGS       =${CMAKE_C_FLAGS}")
 message ("CXX          =${CMAKE_CXX_COMPILER}")
