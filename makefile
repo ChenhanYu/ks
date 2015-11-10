@@ -74,7 +74,7 @@ $(LIBGSKS): $(GSKS_OBJ)
 	$(RANLIB) $@
 
 $(SHAREDLIBGSKS): $(GSKS_OBJ)
-	$(CC) $(CFLAGS) -shared -o $@ $(GSKS_OBJ) $(LILIBS)
+	$(CXX) $(CFLAGS) -shared -o $@ $(GSKS_OBJ) $(LDLIBS)
 
 # ---------------------------------------------------------------------------
 # Object files compiling rules

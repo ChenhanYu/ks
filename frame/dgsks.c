@@ -789,3 +789,52 @@ void dgsks(
   }
   // ------------------------------------------------------------------------
 }
+
+
+
+/*
+ *
+ */ 
+void dgsks_wrapper(
+    int    m,
+    int    n,
+    int    k,
+    double *u,
+    int    *umap,
+    double *XA,
+    double *XA2,
+    int    *alpha,
+    double *XB,
+    double *XB2,
+    int    *beta,
+    double *w,
+    int    *omega,
+    int    type,
+    double scal,
+    double cons, 
+    double powe,
+    double *h
+    )
+{
+  ks_t   kernel;
+  kernel.type = type;
+  kernel.scal = scal;
+  kernel.powe = powe;
+  kernel.h    = h;
+  dgsks(
+    &kernel,
+    m,
+    n,
+    k,
+    u,
+    umap,
+    XA,
+    XA2,
+    alpha,
+    XB,
+    XB2,
+    beta,
+    w,
+    omega
+    );
+}
