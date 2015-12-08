@@ -1,5 +1,6 @@
 #include <immintrin.h> // AVX
 #include <ks.h>
+#include <avx_type.h>
 
 // IEEE-754 double
 // 0      7 8     15 16    23 24    31 32    39 40    47 48    55 56    63

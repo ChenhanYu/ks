@@ -1,129 +1,61 @@
 #!/bin/bash
-export DYLD_LIBRARY_PATH=${DYLD_LIBRARY_PATH}:/opt/intel/lib:${KS_MKL_DIR}/lib
-
-#n=512
-#k=512
-#
-#for (( m=4; m<1600; m+=4 ))
-#do
-#  ./test_dgsks.x $m $n $k
-#done
-
-#m=4096
-#k=512
-#
-#for (( n=4; n<8192; n+=128 ))
-#do
-#  ./test_dgsks.x $m $n $k
-#done
-
-
-
-#./test_dgsks.x 8 4 1
+export DYLD_LIBRARY_PATH=${DYLD_LIBRARY_PATH}:/opt/intel/lib:${GSKS_MKL_DIR}/lib
 
 m=4097
 n=4097
 
-echo 'd_mn2048_gaussian = ['
-for (( k=4; k<1028; k+=31 ))
+echo 'Gaussian = ['
+for (( k=4; k<513; k+=31 ))
 do
-  ./test_dgsks.x $m $n $k
+  ./test_dgsks.x Gaussian $m $n $k
 done
+echo '];'
 
+echo 'Polynomial = ['
+for (( k=4; k<513; k+=31 ))
+do
+  ./test_dgsks.x Polynomial $m $n $k
+done
+echo '];'
 
+echo 'Laplace = ['
+for (( k=4; k<513; k+=31 ))
+do
+  ./test_dgsks.x Laplace $m $n $k
+done
+echo '];'
 
+echo 'Var_bandwidth = ['
+for (( k=4; k<513; k+=31 ))
+do
+  ./test_dgsks.x Var_bandwidth $m $n $k
+done
+echo '];'
 
+echo 'Tanh = ['
+for (( k=4; k<513; k+=31 ))
+do
+  ./test_dgsks.x Tanh $m $n $k
+done
+echo '];'
 
+echo 'Quartic = ['
+for (( k=4; k<513; k+=31 ))
+do
+  ./test_dgsks.x Quartic $m $n $k
+done
+echo '];'
 
+echo 'Multiquadratic = ['
+for (( k=4; k<513; k+=31 ))
+do
+  ./test_dgsks.x Multiquadratic $m $n $k
+done
+echo '];'
 
-
-
-#m=4096
-#n=4096
-#
-#echo 'd_mn4096_tanh = ['
-#for (( k=4; k<260; k+=4 ))
-#do
-#  ./test_dgsks.x $m $n $k
-#done
-#echo '];'
-
-
-#m=8192
-#n=8192
-#
-#echo 'd_mn8192_gaussian = ['
-#for (( k=4; k<260; k+=4 ))
-#do
-#  ./test_dgsks.x $m $n $k
-#done
-#echo '];'
-
-
-
-
-
-#k=8
-#
-#echo 'p1_d8_mn_gaussian = ['
-#for (( m=32; m<4100; m+=32 ))
-#do
-#  ./test_dgsks.x $m $m $k
-#done
-#echo '];'
-#
-#
-#k=64
-#
-#echo 'p1_d64_mn_gaussian = ['
-#for (( m=32; m<4100; m+=32 ))
-#do
-#  ./test_dgsks.x $m $m $k
-#done
-#echo '];'
-#
-#
-#k=512
-#
-#echo 'p1_d64_mn_gaussian = ['
-#for (( m=32; m<4100; m+=32 ))
-#do
-#  ./test_dgsks.x $m $m $k
-#done
-#echo '];'
-
-
-
-
-
-
-
-
-
-
-
-#./test_dgsks.x 16 4 1
-
-#./test_dgsks.x 8192 8192 4
-#./test_dgsks.x 8192 8192 32
-#./test_dgsks.x 8192 8192 256
-#./test_dgsks.x 8192 8192 1024
-
-
-#./test_dgsks.x 16384 512 256
-#./test_dgsks.x 16384 512 256
-#./test_dgsks.x 16384 512 257
-#./test_dgsks.x 16384 512 257
-
-
-#m=20000
-#n=1024
-#for (( k=4; k<1604; k+=32 ))
-#do
-#  ./test_dgsks_mic.x $m $n $k
-#done
-
-
-#./test_dgsks_mic.x 28800 28800 8
-#./test_dgsks_mic.x 4096 4096 240
-#./test_dgsks_mic.x 96 60 1
+echo 'Epanechnikov = ['
+for (( k=4; k<513; k+=31 ))
+do
+  ./test_dgsks.x Epanechnikov $m $n $k
+done
+echo '];'

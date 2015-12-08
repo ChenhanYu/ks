@@ -19,6 +19,8 @@
  * Chenhan
  * Apr 27, 2015: New tanh kernel configuration. 
  *
+ * Chenhan
+ * Dec  7, 2015: Simplify 
  *
  * */
 
@@ -28,6 +30,10 @@
 #include <omp.h>
 #include <math.h>
 #include <ks.h>
+
+#define NUM_POINTS 10240
+#define GFLOPS 1073741824 
+#define TOLERANCE 1E-13
 
 void compute_error(
     int    m,
@@ -61,8 +67,10 @@ void compute_error(
   rel_err /= nrm2;
   rel_err = sqrt( rel_err );
 
-  printf( "rel error = %E, abs error = %E, max error = %E, idx = %d\n", 
-      rel_err, abs_err, max_err, max_idx );
+  if ( rel_err > TOLERANCE ) {
+	  printf( "rel error = %E, abs error = %E, max error = %E, idx = %d\n", 
+		  rel_err, abs_err, max_err, max_idx );
+  }
 }
 
 
@@ -74,25 +82,26 @@ void compute_error(
  *         nxa and nxb as long as those index map--amap, bmap, umap and wmap
  *         --are within the legal range.
  *
+ * @param  *kernel gsks data structure
  * @param  m       Number of target points
  * @param  n       Number of source points
  * @param  k       Data point dimension
  * --------------------------------------------------------------------------
  */
 void test_dgsks(
-  int m,
-  int n,
-  int k
-    ) 
+	ks_t   *kernel,
+	int    m,
+	int    n,
+	int    k
+	) 
 {
   int    i, j, p, nx, iter, n_iter, rhs;
   int    *amap, *bmap, *wmap, *umap;
   double *XA, *XB, *XA2, *XB2, *u, *w, *h, *umkl;
   double tmp, error, flops;
   double ref_beg, ref_time, dgsks_beg, dgsks_time;
-  ks_t   kernel;
 
-  nx     = 4096 * 5;
+  nx     = NUM_POINTS;
   rhs    = KS_RHS;
   n_iter = 1;
 
@@ -124,43 +133,27 @@ void test_dgsks(
   }
 
   for ( i = 0; i < m; i ++ ) {
-    //amap[ i ] = i * 2;
-    amap[ i ] = i;
-    //umap[ i ] = i * 2;
-    umap[ i ] = i;
+    amap[ i ] = i * 2;
+    //amap[ i ] = i;
+    umap[ i ] = i * 2;
+    //umap[ i ] = i;
   }
 
   for ( j = 0; j < n; j ++ ) {
-    //bmap[ j ] = j * 2 + 1;
-    bmap[ j ] = j;
-    //wmap[ j ] = j * 2 + 1;
-    wmap[ j ] = j;
+    bmap[ j ] = j * 2 + 1;
+    //bmap[ j ] = j;
+    wmap[ j ] = j * 2 + 1;
+    //wmap[ j ] = j;
   }
 
   // random[ 0, 0.1 ]
   for ( i = 0; i < nx; i ++ ) {
     for ( p = 0; p < k; p ++ ) {
       XA[ i * k + p ] = (double)( rand() % 100 ) / 1000.0;	
-      //printf( "i = %d\n", i );
-      //XA[ i * k + p ] = 1.0;	
     }
   }
   // ------------------------------------------------------------------------
 
-  //printf( "XA03 = %lf, %lf, %lf, %lf\n", XA[96], XA[97], XA[98], XA[99] );
-  //printf( "XA47 = %lf, %lf, %lf, %lf\n", XA[4], XA[5], XA[6], XA[7] );
-  //printf( "XA811 = %lf, %lf, %lf, %lf\n", XA[8], XA[9], XA[10], XA[11] );
-  //printf( "XA1215 = %lf, %lf, %lf, %lf\n", XA[12], XA[13], XA[14], XA[15] );
-
-
-  // random[ 0, 1 ]
-//  for ( j = 0; j < n ; j ++ ) {
-//    for ( p = 0; p < k; p ++ ) {
-//      XB[ j * k + p ] = (double)( rand() % 100 ) / 1000.0;
-//      //XB[ j * k + p ] = 1.0;
-//    }
-//  }
-  //printf( "XB03 = %lf, %lf, %lf, %lf\n", XB[0], XB[1], XB[2], XB[3] );
 
   // ------------------------------------------------------------------------
   // Compute XA2
@@ -174,21 +167,6 @@ void test_dgsks(
   }
   // ------------------------------------------------------------------------
 
-  //printf( "XA2811 = %lf, %lf, %lf, %lf\n", XA2[96], XA2[97], XA2[98], XA2[99] );
-
-
-  // Compute XB2
-//  for ( j = 0; j < n; j ++ ) {
-//    tmp = 0.0;
-//    for ( p = 0; p < k; p ++ ) {
-//      tmp += XB[ j * k + p ] * XB[ j * k + p ];
-//    }
-//    XB2[ j ] = tmp;
-//  }
-
-  //printf( "XB203 = %lf, %lf, %lf, %lf\n", XB2[0], XB2[1], XB2[2], XB2[3] );
-
-
 
   // ------------------------------------------------------------------------
   // Use the same coordinate table
@@ -199,213 +177,86 @@ void test_dgsks(
 
 
   // ------------------------------------------------------------------------
-  // Test Gaussian Kernel
-  // ------------------------------------------------------------------------
-  kernel.type = KS_GAUSSIAN;
-  kernel.scal = -0.5;
-  //kernel.scal = -1.0 * 0.16 * 0.16;
-  //kernel.scal = -5000.0;
-  // ------------------------------------------------------------------------
-
-
-  // ------------------------------------------------------------------------
   // Test Variable Bandwidth Gaussian Kernel
   // ------------------------------------------------------------------------
-  //kernel.type = KS_GAUSSIAN_VAR_BANDWIDTH;
-  //kernel.h = malloc( sizeof(double) * nx );
-  //for ( i = 0; i < nx; i ++ ) {
-  //  //kernel.h[ i ] = -0.5;
-  //  //kernel.h[ i ] = ( -0.5 * i ) / 1000.0 ;
-  //  kernel.h[ i ] = ( 1.0 + 0.5 / ( 1 + exp( -1.0 * XA2[ i ] ) ) );
-  //  kernel.h[ i ] = -1.0 / ( 2.0 * kernel.h[ i ] * kernel.h[ i ] );
-  //}
+  if ( kernel->type = KS_GAUSSIAN_VAR_BANDWIDTH ) {
+    kernel->h = (double*)malloc( sizeof(double) * nx );
+    for ( i = 0; i < nx; i ++ ) {
+      kernel->h[ i ] = ( 1.0 + 0.5 / ( 1 + exp( -1.0 * XA2[ i ] ) ) );
+      kernel->h[ i ] = -1.0 / ( 2.0 * kernel->h[ i ] * kernel->h[ i ] );
+    }
+  }
   // ------------------------------------------------------------------------
 
 
-  // ------------------------------------------------------------------------
-  // Test Polynomial Kernel
-  // ------------------------------------------------------------------------
-  //kernel.type = KS_POLYNOMIAL;
-  //kernel.powe = 3.0;
-  //kernel.scal = 0.1;
-  //kernel.cons = 0.1;
-  // ------------------------------------------------------------------------
 
-
-  // ------------------------------------------------------------------------
-  // Test Laplace Kernel
-  // ------------------------------------------------------------------------
-  //kernel.type = KS_LAPLACE;
-  // ------------------------------------------------------------------------
-
-
-  // ------------------------------------------------------------------------
-  // Test Tanh Kernel
-  // ------------------------------------------------------------------------
-  //kernel.type = KS_TANH;
-  //kernel.scal = 0.1;
-  //kernel.cons = 0.1;
-  // ------------------------------------------------------------------------
-
-
-  // ------------------------------------------------------------------------
-  // Test Quartic Kernel
-  // ------------------------------------------------------------------------
-  //kernel.type = KS_QUARTIC;
-  // ------------------------------------------------------------------------
-
-
-  // ------------------------------------------------------------------------
-  // Test Multiquadratic Kernel
-  // ------------------------------------------------------------------------
-  //kernel.type = KS_MULTIQUADRATIC;
-  //kernel.cons = 1.0 * 1.0;
-  // ------------------------------------------------------------------------
-
-
-  // ------------------------------------------------------------------------
-  // Test Epanechnikov Kernel
-  // ------------------------------------------------------------------------
-  //kernel.type = KS_EPANECHNIKOV;
-  // ------------------------------------------------------------------------
-
-
-    dgsks(
-        &kernel,
-        m,
-        n,
-        k,
-        u,
-        umap,     // New feature, a separate ulist
-        XA,
-        XA2,
-        amap,
-        XB,
-        XB2,
-        bmap,
-        w,
-        wmap
-        );
-
-
-  dgsks_beg = omp_get_wtime();
   // ------------------------------------------------------------------------
   // Call my implementation
   // ------------------------------------------------------------------------
-  for ( iter = 0; iter < n_iter; iter ++ ) {
+  for ( iter = -1; iter < n_iter; iter ++ ) {
+    if ( iter == 0 ) dgsks_beg = omp_get_wtime();
     dgsks(
-        &kernel,
-        m,
-        n,
-        k,
-        u,
-        umap,     // New feature, a separate ulist
-        XA,
-        XA2,
-        amap,
-        XB,
-        XB2,
-        bmap,
-        w,
-        wmap
-        );
+        kernel,
+        m, n, k,
+        u,       umap,
+        XA, XA2, amap,
+        XB, XB2, bmap,
+        w,       wmap
+    );
   }
+  dgsks_time = omp_get_wtime() - dgsks_beg;
   // ------------------------------------------------------------------------
 
 
-  dgsks_time = omp_get_wtime() - dgsks_beg;
-
-
-
-
-
-    dgsks_ref(
-        &kernel,
-        m,
-        n,
-        k,
-        umkl,
-        umap,    // New feature, a separate ulist
-        XA,
-        XA2,
-        amap,
-        XB,
-        XB2,
-        bmap,
-        w,
-        wmap
-        );
-
-  ref_beg = omp_get_wtime();
   // ------------------------------------------------------------------------
   // Call the reference function 
   // ------------------------------------------------------------------------
-  for ( iter = 0; iter < n_iter; iter ++ ) {
+  for ( iter = -1; iter < n_iter; iter ++ ) {
+    if ( iter == 0 ) ref_beg = omp_get_wtime();
     dgsks_ref(
-        &kernel,
-        m,
-        n,
-        k,
-        umkl,
-        umap,    // New feature, a separate ulist
-        XA,
-        XA2,
-        amap,
-        XB,
-        XB2,
-        bmap,
-        w,
-        wmap
+        kernel,
+        m, n, k,
+        umkl,    umap,
+        XA, XA2, amap,
+        XB, XB2, bmap,
+        w,       wmap
         );
   }
-  // ------------------------------------------------------------------------
   ref_time = omp_get_wtime() - ref_beg;
+  // ------------------------------------------------------------------------
+
   ref_time   /= n_iter;
   dgsks_time /= n_iter;
 
 
-  //error = 0.0;
-  //for ( i = 0; i < m; i ++ ) {
-  //  if ( fabs( umkl[ i ] - u[ i ] ) > 0.0000000001 ) {
-  //    printf( " error\n ");
-  //    printf( "umkl[ %d ] = %lf, u[ i ] = %lf\n", i, umkl[ i ], u[ i ] );
-  //    break;
-  //  }
-  //  tmp = umkl[ i ] - u[ i ];
-  //  error += tmp * tmp;
-  //}
-
   compute_error( m, rhs, u, umkl );
 
-  //printf( "%lf, %lf\n", umkl[ 0 ], u[ 0 ] );
 
-  switch ( kernel.type ) {
+  switch ( kernel->type ) {
     case KS_GAUSSIAN:
-      flops = ( (double)( m * n ) / ( 1024 * 1024 * 1024 ) ) * ( 2 * k + 35 + 2 );
+      flops = ( (double)( m * n ) / GFLOPS ) * ( 2 * k + 35 + 2 );
       break;
     case KS_GAUSSIAN_VAR_BANDWIDTH:
-      flops = ( (double)( m * n ) / ( 1024 * 1024 * 1024 ) ) * ( 2 * k + 35 );
-      free( kernel.h );
+      flops = ( (double)( m * n ) / GFLOPS ) * ( 2 * k + 35 );
+      free( kernel->h );
       break;
     case KS_POLYNOMIAL:
-      // Need to be readjusted
-      //flops = ( (double)( m * n ) / ( 1024 * 1024 * 1024 ) ) * ( 2 * k + 50 );
-      flops = ( (double)( m * n ) / ( 1024 * 1024 * 1024 ) ) * ( 2 * k + 6 );
+      flops = ( (double)( m * n ) / GFLOPS ) * ( 2 * k + 6 );
       break;
     case KS_LAPLACE:
-      flops = ( (double)( m * n ) / ( 1024 * 1024 * 1024 ) ) * ( 2 * k + 60 );
+      flops = ( (double)( m * n ) / GFLOPS ) * ( 2 * k + 60 );
       break;
     case KS_TANH:
-      flops = ( (double)( m * n ) / ( 1024 * 1024 * 1024 ) ) * ( 2 * k + 89 );
+      flops = ( (double)( m * n ) / GFLOPS ) * ( 2 * k + 89 );
       break;
     case KS_QUARTIC:
-      flops = ( (double)( m * n ) / ( 1024 * 1024 * 1024 ) ) * ( 2 * k + 8 );
+      flops = ( (double)( m * n ) / GFLOPS ) * ( 2 * k + 8 );
       break;
     case KS_MULTIQUADRATIC:
-      flops = ( (double)( m * n ) / ( 1024 * 1024 * 1024 ) ) * ( 2 * k + 6 );
+      flops = ( (double)( m * n ) / GFLOPS ) * ( 2 * k + 6 );
       break;
     case KS_EPANECHNIKOV:
-      flops = ( (double)( m * n ) / ( 1024 * 1024 * 1024 ) ) * ( 2 * k + 7 );
+      flops = ( (double)( m * n ) / GFLOPS ) * ( 2 * k + 7 );
       break;
     default:
       exit( 1 );
@@ -421,26 +272,73 @@ void test_dgsks(
 
 }
 
+/*
+ * --------------------------------------------------------------------------
+ * @brief  This is the main() function that tests GSKS with different 
+ *         kernels. Now it takes four arguments. It may take more in the
+ *         future.
+ *
+ *         0. Gaussian( r )       = exp( scal * r^2 )
+ *         1. Polynomial( x^Ty )  = ( scal * x^Ty + cons ) ** powe
+ *         2. Laplace( r )        = 
+ *         3. Var_bandwidth( r )  = exp( h[ i ] * r^2 )
+ *         4. Tanh( x^Ty )        = tanh( x^Ty )
+ *         5. Quartic( r )        = 
+ *         6. Multiquadratic( r ) =
+ *         7. Epanechnikov( r )   =
+ * --------------------------------------------------------------------------
+ */ 
 int main( int argc, char *argv[] )
 {
-  int    m, n, k; 
+  int    m, n, k, i;
+  ks_t   kernel;
+  char   type[ 30 ];
 
-  sscanf( argv[ 1 ], "%d", &m );
-  sscanf( argv[ 2 ], "%d", &n );
-  sscanf( argv[ 3 ], "%d", &k );
+  sscanf( argv[ 1 ], "%s", type );
+  sscanf( argv[ 2 ], "%d", &m );
+  sscanf( argv[ 3 ], "%d", &n );
+  sscanf( argv[ 4 ], "%d", &k );
 
-  //printf( "Test Dgsks: m = %d, n = %d, k = %d\n", m, n, k );
+  /*
+   * Setup kernel-dependent parameters. Now we only allow default values.
+   */
+  if ( !strcmp( type, "Gaussian" ) ) {
+    kernel.type = KS_GAUSSIAN;
+    kernel.scal = -0.5;
+  }
+  else if ( !strcmp( type, "Polynomial" ) ) {
+    kernel.type = KS_POLYNOMIAL;
+    kernel.powe = 3.0;
+    kernel.scal = 0.1;
+    kernel.cons = 0.1;
+  }
+  else if ( !strcmp( type, "Laplace" ) ) {
+    kernel.type = KS_LAPLACE;
+  }
+  else if ( !strcmp( type, "Var_bandwidth" ) ) {
+    kernel.type = KS_GAUSSIAN_VAR_BANDWIDTH;
+  }
+  else if ( !strcmp( type, "Tanh" ) ) {
+    kernel.type = KS_TANH;
+    kernel.scal = 0.1;
+    kernel.cons = 0.1;
+  }
+  else if ( !strcmp( type, "Quartic" ) ) {
+    kernel.type = KS_QUARTIC;
+  }
+  else if ( !strcmp( type, "Multiquadratic" ) ) {
+    kernel.type = KS_MULTIQUADRATIC;
+    kernel.cons = 1.0 ;
+  }
+  else if ( !strcmp( type, "Epanechnikov" ) ) {
+    kernel.type = KS_EPANECHNIKOV;
+  }  
+  else {
+	  printf( "gsksMain(): kernel type mismatch %s\n", type );
+    exit( 1 );
+  }
 
-  //printf( "KS_GAUSSIAN              : %d\n", KS_GAUSSIAN );
-  //printf( "KS_POLYNOMIAL            : %d\n", KS_POLYNOMIAL );
-  //printf( "KS_LAPLACE               : %d\n", KS_LAPLACE );
-  //printf( "KS_GAUSSIAN_VAR_BANDWIDTH: %d\n", KS_GAUSSIAN_VAR_BANDWIDTH );
-  //printf( "KS_TANH                  : %d\n", KS_TANH );
-  //printf( "KS_QUARTIC               : %d\n", KS_QUARTIC );
-  //printf( "KS_MULTIQUADRATIC        : %d\n", KS_MULTIQUADRATIC );
-
-  test_dgsks( m, n, k );
-
+  test_dgsks( &kernel, m, n, k );
 
   return 0;
 }

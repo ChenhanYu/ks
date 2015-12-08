@@ -25,6 +25,7 @@
 #include <stdlib.h>
 #include <omp.h>
 #include <ks.h>
+#include <gsks_config.h>
 
 double *ks_malloc_aligned(
     int    m,

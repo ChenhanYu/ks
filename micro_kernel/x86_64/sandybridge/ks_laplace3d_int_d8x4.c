@@ -1,6 +1,7 @@
 #include <immintrin.h> // AVX
 #include <math.h>
 #include <ks.h>
+#include <avx_type.h>
 
 void ks_laplace3d_int_d8x4(
     int    k,

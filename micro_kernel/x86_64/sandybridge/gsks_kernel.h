@@ -1,3 +1,6 @@
+#ifndef __GSKS_KERNEL_H__
+#define __GSKS_KERNEL_H__
+
 void ks_rank_k_asm_d8x4(
     int    k,
     double *a,
@@ -187,3 +190,5 @@ void (*rankk) (
   ks_rank_k_asm_d8x4
   //ks_rank_k_int_d8x4
 };
+
+#endif // define __GSKS_KERNEL_H__

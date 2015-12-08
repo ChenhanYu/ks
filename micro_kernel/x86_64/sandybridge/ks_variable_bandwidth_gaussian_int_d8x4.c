@@ -1,5 +1,6 @@
 #include <immintrin.h> // AVX
 #include <ks.h>
+#include <avx_type.h>
 
 
 void ks_variable_bandwidth_gaussian_int_d8x4(

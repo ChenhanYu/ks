@@ -52,9 +52,8 @@
  * */
 
 #include <ks.h>
-
-// Global kernel table.
-#include <ks_kernel.h>
+#include <gsks_config.h>
+#include <gsks_kernel.h>
 
 
 #define min( i, j ) ( (i)<(j) ? (i): (j) )

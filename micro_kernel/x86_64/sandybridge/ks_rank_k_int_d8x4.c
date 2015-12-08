@@ -1,5 +1,6 @@
 #include <immintrin.h> // AVX
 #include <ks.h>
+#include <avx_type.h>
 
 
 void ks_rank_k_int_d8x4(
