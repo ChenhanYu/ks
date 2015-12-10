@@ -76,18 +76,18 @@ inline void packA_kcxmc(
     )
 {
   int    i, p;
-  double *a_pntr[ DKS_MR ];
+  double *a_pntr[ DKS_PACK_MR ];
 
   for ( i = 0; i < m; i ++ ) {
     a_pntr[ i ] = XA + ldXA * amap[ i ];
   }
 
-  for ( i = m; i < DKS_MR; i ++ ) {
+  for ( i = m; i < DKS_PACK_MR; i ++ ) {
     a_pntr[ i ] = XA + ldXA * amap[ 0 ];
   }
 
   for ( p = 0; p < k; p ++ ) {
-    for ( i = 0; i < DKS_MR; i ++ ) {
+    for ( i = 0; i < DKS_PACK_MR; i ++ ) {
       *packA ++ = *a_pntr[ i ] ++;
     }
   }
@@ -110,18 +110,21 @@ inline void packB_kcxnc(
     )
 {
   int    j, p; 
-  double *b_pntr[ DKS_NR ];
+  //double *b_pntr[ DKS_NR ];
+  double *b_pntr[ DKS_PACK_NR ];
 
   for ( j = 0; j < n; j ++ ) {
     b_pntr[ j ] = XB + ldXB * bmap[ j ];
   }
 
-  for ( j = n; j < DKS_NR; j ++ ) {
+  //for ( j = n; j < DKS_NR; j ++ ) {
+  for ( j = n; j < DKS_PACK_NR; j ++ ) {
     b_pntr[ j ] = XB + ldXB * bmap[ 0 ];
   }
 
   for ( p = 0; p < k; p ++ ) {
-    for ( j = 0; j < DKS_NR; j ++ ) {
+    //for ( j = 0; j < DKS_NR; j ++ ) {
+    for ( j = 0; j < DKS_PACK_NR; j ++ ) {
       *packB ++ = *b_pntr[ j ] ++;
     }
   }
@@ -138,7 +141,7 @@ inline void packw_rhsxnc(
     )
 {
   int    j, p;
-  double *w_pntr[ DKS_NR ];
+  double *w_pntr[ DKS_PACK_NR ];
 
   for ( j = 0; j < n; j ++ ) {
     w_pntr[ j ] = w + ldw * wmap[ j ];
@@ -148,8 +151,7 @@ inline void packw_rhsxnc(
     for ( j = 0; j < n; j ++ ) {
       *packw ++ = *w_pntr[ j ] ++;
     }
-    // Edge case.
-    for ( j = n; j < DKS_NR; j ++ ) {
+    for ( j = n; j < DKS_PACK_NR; j ++ ) {
       *packw ++ = 0.0;
     }
   }
@@ -166,7 +168,7 @@ inline void packu_rhsxmc(
     )
 {
   int    i, p;
-  double *u_pntr[ DKS_MR ];
+  double *u_pntr[ DKS_PACK_MR ];
 
   for ( i = 0; i < m; i ++ ) {
     u_pntr[ i ] = u + ldu * umap[ i ];
@@ -176,7 +178,7 @@ inline void packu_rhsxmc(
     for ( i = 0; i < m; i ++ ) {
       *packu ++ = *u_pntr[ i ] ++;
     }
-    for ( i = m; i < DKS_MR; i ++ ) {
+    for ( i = m; i < DKS_PACK_MR; i ++ ) {
       packu ++;
     }
   }
@@ -193,7 +195,7 @@ inline void unpacku_rhsxmc(
     )
 {
   int    i, p;
-  double *u_pntr[ DKS_MR ];
+  double *u_pntr[ DKS_PACK_MR ];
 
   for ( i = 0; i < m; i ++ ) {
     u_pntr[ i ] = u + ldu * umap[ i ];
@@ -203,7 +205,7 @@ inline void unpacku_rhsxmc(
     for ( i = 0; i < m; i ++ ) {
       *u_pntr[ i ] ++ = *packu ++;
     }
-    for ( i = m; i < DKS_MR; i ++ ) {
+    for ( i = m; i < DKS_PACK_MR; i ++ ) {
       packu ++;
     }
   }
@@ -242,23 +244,21 @@ void rank_k_macro_kernel(
     int    pc
     )
 {
-  int    i, j, j_next;
+  int    i, j, ip, jp;
   aux_t  aux;
 
   aux.pc     = pc;
   aux.b_next = packB;
 
-  for ( j = 0; j < n; j += DKS_NR ) {
-    j_next = j + DKS_NR;
-    for ( i = 0; i < m; i += DKS_MR ) {
+  for ( j = 0, jp = 0; j < n; j += DKS_NR, jp += DKS_PACK_NR ) {
+    for ( i = 0, ip = 0; i < m; i += DKS_MR, ip += DKS_PACK_MR ) {
       if ( i + DKS_MR >= m ) {
-        aux.b_next += DKS_NR * k;
+        aux.b_next += DKS_PACK_NR * k;
       }
-
       ( *rankk ) (
           k,
-          &packA[ i * k ],
-          &packB[ j * k ],
+          &packA[ ip * k ],
+          &packB[ jp * k ],
           &packC[ j * ldc + i * DKS_NR ],             // packed
           ldc,
           &aux
@@ -309,29 +309,28 @@ void dgsks_macro_kernel(
     int    pc
     )
 {
-  int    i, j, j_next, tid;
+  int    i, j, ip, jp;
   aux_t  aux;
 
   aux.pc     = pc;
   aux.b_next = packB;
 
-  for ( j = 0; j < n; j += DKS_NR ) {
-    j_next = j + DKS_NR;
-    for ( i = 0; i < m; i += DKS_MR ) {
+  for ( j = 0, jp = 0; j < n; j += DKS_NR, jp += DKS_PACK_NR ) {
+    for ( i = 0, ip = 0; i < m; i += DKS_MR, ip += DKS_PACK_MR ) {
       if ( i + DKS_MR >= m ) {
-        aux.b_next += DKS_NR * k;
+        aux.b_next += DKS_PACK_NR * k;
       }
       ( *micro[ kernel->type ] )(
           k,
           KS_RHS,
-          packh  + j,
-          packu  + i * KS_RHS,
-          packA2 + i,
-          packA  + i * k,
-          packB2 + j,
-          packB  + j * k,
-          packw  + j * KS_RHS,
-          packC  + j * ldc + i * DKS_NR, // packed
+          packh  + jp,
+          packu  + ip * KS_RHS,
+          packA2 + ip,
+          packA  + ip * k,
+          packB2 + jp,
+          packB  + jp * k,
+          packw  + jp * KS_RHS,
+          packC  + j  * ldc + i * DKS_NR, // packed
           kernel,
           &aux
           );
@@ -379,7 +378,7 @@ void dgsks(
     int    *wmap
     )
 {
-  int    i, j, p;
+  int    i, j, p, ip, jp;
   int    ic, ib, jc, jb, pc, pb;
   int    ir, jr;
   int    pack_norm, pack_bandwidth, ks_ic_nt;
@@ -387,31 +386,27 @@ void dgsks(
   double *packA, *packB, *packC, *packh, *packw, *packu, *packA2, *packB2;
   char   *str;
 
-
   // Early return if possible
   if ( m == 0 || n == 0 || k == 0 ) {
     printf( "dgsks(): early return\n" );
     return;
   }
 
-
   // Sequential is the default situation.
   ks_ic_nt = 1;
 
-  
   // Check the environment variable.
   str = getenv( "KS_IC_NT" );
   if ( str != NULL ) {
     ks_ic_nt = (int)strtol( str, NULL, 10 );
   }
 
-
-  packA  = ks_malloc_aligned( DKS_KC, ( DKS_MC + 1 ) * ks_ic_nt, sizeof(double) ); 
-  packA2 = ks_malloc_aligned(      1, ( DKS_MC + 1 ) * ks_ic_nt, sizeof(double) ); 
-  packu  = ks_malloc_aligned( KS_RHS, ( DKS_MC + 1 ) * ks_ic_nt, sizeof(double) ); 
-  packB  = ks_malloc_aligned( DKS_KC, ( DKS_NC + 1 )           , sizeof(double) ); 
-  packB2 = ks_malloc_aligned(      1, ( DKS_NC + 1 )           , sizeof(double) ); 
-  packw  = ks_malloc_aligned( KS_RHS, ( DKS_NC + 1 )           , sizeof(double) ); 
+  packA  = ks_malloc_aligned( DKS_KC, ( DKS_PACK_MC + 1 ) * ks_ic_nt, sizeof(double) ); 
+  packA2 = ks_malloc_aligned(      1, ( DKS_PACK_MC + 1 ) * ks_ic_nt, sizeof(double) ); 
+  packu  = ks_malloc_aligned( KS_RHS, ( DKS_PACK_MC + 1 ) * ks_ic_nt, sizeof(double) ); 
+  packB  = ks_malloc_aligned( DKS_KC, ( DKS_PACK_NC + 1 )           , sizeof(double) ); 
+  packB2 = ks_malloc_aligned(      1, ( DKS_PACK_NC + 1 )           , sizeof(double) ); 
+  packw  = ks_malloc_aligned( KS_RHS, ( DKS_PACK_NC + 1 )           , sizeof(double) ); 
 
 
 
@@ -427,7 +422,7 @@ void dgsks(
       }
       pack_bandwidth = 1;
       pack_norm      = 1;
-      packh          = ks_malloc_aligned( 1, ( DKS_NC + 1 ), sizeof(double) ); 
+      packh          = ks_malloc_aligned( 1, ( DKS_PACK_NC + 1 ), sizeof(double) ); 
       break;
     case KS_POLYNOMIAL:
       pack_bandwidth = 0;
@@ -466,48 +461,39 @@ void dgsks(
 
 
   if ( k > DKS_KC ) {
-    ldc  = ( ( m - 1 ) / DKS_MR + 1 ) * DKS_MR;
+    ldc  = ( ( m - 1 ) / DKS_PACK_MR + 1 ) * DKS_PACK_MR;
     padn = DKS_NC;
     if ( n < DKS_NC ) {
-      padn = ( ( n - 1 ) / DKS_NR + 1 ) * DKS_NR;
+      padn = ( ( n - 1 ) / DKS_PACK_NR + 1 ) * DKS_PACK_NR;
     }
 
-    // nonpacked
     packC = ks_malloc_aligned( ldc, padn, sizeof(double) ); 
-
 
     for ( jc = 0; jc < n; jc += DKS_NC ) {            // 6-th loop
       jb = min( n - jc, DKS_NC );
       for ( pc = 0; pc < k; pc += DKS_KC ) {          // 5-th loop
         pb = min( k - pc, DKS_KC );
 
-
-        #pragma omp parallel for num_threads( ks_ic_nt ) private( jr )
-        for ( j = 0; j < jb; j += DKS_NR ) {          // packB, packB2, packw
+        #pragma omp parallel for num_threads( ks_ic_nt ) private( j, jr, jp )
+        for ( j = 0, jp = 0; j < jb; j += DKS_NR, jp += DKS_PACK_NR ) {
           
           if ( pc + DKS_KC >= k ) {
-            // Initialize w
-            //for ( jr = 0; jr < DKS_NR; jr ++ ) {
-            //  packw[ j + jr ] = 0.0;
-            //}
-
-            packw_rhsxnc(
+            packw_rhsxnc(                            // packw
                 min( jb - j, DKS_NR ),
                 KS_RHS,
                 w,
                 KS_RHS,
                 &wmap[ jc + j ],
-                &packw[ j * KS_RHS ]
+                &packw[ jp * KS_RHS ]
                 );
 
-            // packw, packB2, packh (alternatively)
+            // packB2, packh (alternatively)
             for ( jr = 0; jr < min( jb - j, DKS_NR ); jr ++ ) {
-              //packw[ j + jr ] = w[ wmap[ jc + j + jr ] ];
               if ( pack_norm ) {
-                packB2[ j + jr ] = XB2[ bmap[ jc + j + jr ] ];
+                packB2[ jp + jr ] = XB2[ bmap[ jc + j + jr ] ];
               }
               if ( pack_bandwidth ) {
-                packh[ j + jr ] = kernel->h[ bmap[ jc + j + jr ] ];
+                packh[ jp + jr ] = kernel->h[ bmap[ jc + j + jr ] ];
               }
             }
           }
@@ -518,20 +504,18 @@ void dgsks(
               &XB[ pc ],
               k, // should be ldXB instead
               &bmap[ jc + j ],
-              &packB[ j * pb ]
+              &packB[ jp * pb ]
               );
         }
 
-        
-        #pragma omp parallel for num_threads( ks_ic_nt ) private( ic, ib, i, ir )
+        #pragma omp parallel for num_threads( ks_ic_nt ) private( ic, ib, i, ir, ip )
         for ( ic = 0; ic < m; ic += DKS_MC ) {        // 4-th loop
 
           // Get the thread id ( 0 ~ 9 )
           int     tid = omp_get_thread_num();
-          // int     tid = 0;
 
           ib = min( m - ic, DKS_MC );
-          for ( i = 0; i < ib; i += DKS_MR ) {
+          for ( i = 0, ip = 0; i < ib; i += DKS_MR, ip += DKS_PACK_MR ) {
             if ( pc + DKS_KC >= k ) {
 
               packu_rhsxmc(
@@ -540,14 +524,13 @@ void dgsks(
                   u,
                   KS_RHS,
                   &umap[ ic + i ],
-                  &packu[ tid * DKS_MC * KS_RHS + i * KS_RHS ]
+                  &packu[ tid * DKS_PACK_MC * KS_RHS + ip * KS_RHS ]
                   );
 
 
               for ( ir = 0; ir < min( ib - i, DKS_MR ); ir ++ ) {
-                //packu[ tid * DKS_MC + i + ir ] = u[ umap[ ic + i + ir ] ]; 
                 if ( pack_norm ) {
-                  packA2[ tid * DKS_MC + i + ir ] = XA2[ amap[ ic + i + ir ] ];
+                  packA2[ tid * DKS_PACK_MC + ip + ir ] = XA2[ amap[ ic + i + ir ] ];
                 }
               }
             }
@@ -557,7 +540,7 @@ void dgsks(
                 &XA[ pc ],
                 k,
                 &amap[ ic + i ],
-                &packA[ tid * DKS_MC * pb + i * pb ]
+                &packA[ tid * DKS_PACK_MC * pb + ip * pb ]
                 );
           }
 
@@ -567,7 +550,7 @@ void dgsks(
                 ib,
                 jb,
                 pb,
-                packA   + tid * DKS_MC * pb,
+                packA   + tid * DKS_PACK_MC * pb,
                 packB,
                 packC   + ic * padn,                  // packed
                 ( ( ib - 1 ) / DKS_MR + 1 ) * DKS_MR, // packed ldc
@@ -580,9 +563,9 @@ void dgsks(
                 ib,
                 jb,
                 pb,
-                packu  + tid * DKS_MC * KS_RHS,
-                packA  + tid * DKS_MC * pb,
-                packA2 + tid * DKS_MC,
+                packu  + tid * DKS_PACK_MC * KS_RHS,
+                packA  + tid * DKS_PACK_MC * pb,
+                packA2 + tid * DKS_PACK_MC,
                 packB,
                 packB2,
                 packw,
@@ -593,18 +576,15 @@ void dgsks(
                 );
 
             /* Unpack u */
-            for ( i = 0; i < ib; i += DKS_MR ) {
+            for ( i = 0, ip = 0; i < ib; i += DKS_MR, ip +=DKS_PACK_MR ) {
               unpacku_rhsxmc(
                   min( ib - i, DKS_MR ),
                   KS_RHS,
                   u,
                   KS_RHS,
                   &umap[ ic + i ],
-                  &packu[ tid * DKS_MC * KS_RHS + i * KS_RHS ]
+                  &packu[ tid * DKS_PACK_MC * KS_RHS + ip * KS_RHS ]
                   );
-              //for ( ir = 0; ir < min( ib - i, DKS_MR ); ir ++ ) {
-              //  u[ umap[ ic + i + ir ] ] = packu[ tid * DKS_MC + i + ir ];
-              //}
             }
           }
         }
@@ -615,25 +595,13 @@ void dgsks(
   }
   else {
 
-
     for ( jc = 0; jc < n; jc += DKS_NC ) {            // 6-th loop
       jb = min( n - jc, DKS_NC );
       for ( pc = 0; pc < k; pc += DKS_KC ) {          // 5-th loop
         pb = min( k - pc, DKS_KC );
 
-        // packB, packw, packbb
-        #pragma omp parallel for num_threads( ks_ic_nt ) private( jr )
-        for ( j = 0; j < jb; j += DKS_NR ) {
-          // Initialize w
-          //for ( jr = 0; jr < DKS_NR; jr ++ ) {
-          //  packw[ j + jr ] = 0.0;
-          //}
-
-          if ( pack_bandwidth ) {
-            for ( jr = 0; jr < DKS_NR; jr ++ ) {
-              packh[ j + jr ] = 0.0;
-            }
-          }
+        #pragma omp parallel for num_threads( ks_ic_nt ) private( j, jr, jp )
+        for ( j = 0, jp = 0; j < jb; j += DKS_NR, jp += DKS_PACK_NR ) {
 
           packw_rhsxnc(
             min( jb - j, DKS_NR ),
@@ -641,19 +609,16 @@ void dgsks(
             w,
             KS_RHS,
             &wmap[ jc + j ],
-            &packw[ j * KS_RHS ]
+            &packw[ jp * KS_RHS ]
             );
 
-
-
-          // packw and packB2
+          // packB2 and packh
           for ( jr = 0; jr < min( jb - j, DKS_NR ); jr ++ ) {
-            //packw[ j + jr ] = w[ wmap[ jc + j + jr ] ];
             if ( pack_norm ) {
-              packB2[ j + jr ] = XB2[ bmap[ jc + j + jr ] ];
+              packB2[ jp + jr ] = XB2[ bmap[ jc + j + jr ] ];
             }
             if ( pack_bandwidth ) {
-              packh[ j + jr ] = kernel->h[ bmap[ jc + j + jr ] ];
+              packh[ jp + jr ] = kernel->h[ bmap[ jc + j + jr ] ];
             }
           }
 
@@ -664,46 +629,40 @@ void dgsks(
               XB,
               k, // should be ldXB instead
               &bmap[ jc + j ],
-              &packB[ j * k ]
+              &packB[ jp * k ]
               );
         }
 
-        //printf( "dgsks(): 4-th loop, jc = %d, pc = %d\n", jc, pc );
-
-        #pragma omp parallel for num_threads( ks_ic_nt ) private( ic, ib, i, ir )
+        #pragma omp parallel for num_threads( ks_ic_nt ) private( ic, ib, i, ir, ip )
         for ( ic = 0; ic < m; ic += DKS_MC ) {       // 4-th loop
 
           // Get the thread id ( 0 ~ 9 )
           int     tid = omp_get_thread_num();
-          //int     tid = 0;
 
           ib = min( m - ic, DKS_MC );
-          for ( i = 0; i < ib; i += DKS_MR ) {
+          for ( i = 0, ip = 0; i < ib; i += DKS_MR, ip += DKS_PACK_MR ) {
 
-            // packu with multiple rhs.
             packu_rhsxmc(
               min( ib - i, DKS_MR ),
               KS_RHS,
               u,
               KS_RHS,
               &umap[ ic + i ],
-              &packu[ tid * DKS_MC * KS_RHS + i * KS_RHS ]
+              &packu[ tid * DKS_PACK_MC * KS_RHS + ip * KS_RHS ]
               );
 
             for ( ir = 0; ir < min( ib - i, DKS_MR ); ir ++ ) {
-              //packu[ tid * DKS_MC + i + ir ] = u[ umap[ ic + i + ir ] ];
               if ( pack_norm ) {
-                packA2[ tid * DKS_MC + i + ir ] = XA2[ amap[ ic + i + ir ] ];
+                packA2[ tid * DKS_PACK_MC + ip + ir ] = XA2[ amap[ ic + i + ir ] ];
               }
             }
-            //printf( "i = %d, ib = %d, min = %d\n", i, ib, min( ib - i, DKS_MR ) );
             packA_kcxmc(
                 min( ib - i, DKS_MR ),
                 pb,
                 XA,
                 k,
                 &amap[ ic + i ],
-                &packA[ tid * DKS_MC * pb + i * pb ]
+                &packA[ tid * DKS_PACK_MC * pb + ip * pb ]
                 );
           }
 
@@ -712,9 +671,9 @@ void dgsks(
               ib,
               jb,
               pb,
-              packu  + tid * DKS_MC * KS_RHS,
-              packA  + tid * DKS_MC * pb,
-              packA2 + tid * DKS_MC,
+              packu  + tid * DKS_PACK_MC * KS_RHS,
+              packA  + tid * DKS_PACK_MC * pb,
+              packA2 + tid * DKS_PACK_MC,
               packB,
               packB2,
               packw,
@@ -724,23 +683,16 @@ void dgsks(
               pc
               );
 
-          for ( i = 0; i < ib; i += DKS_MR ) {
-
-            // unpacku with multiple rhs.
-            unpacku_rhsxmc(
-              min( ib - i, DKS_MR ),
-              KS_RHS,
-              u,
-              KS_RHS,
-              &umap[ ic + i ],
-              &packu[ tid * DKS_MC * KS_RHS + i * KS_RHS ]
-              );
-
-
-            // unpacku with single rhs.
-            //for ( ir = 0; ir < min( ib - i, DKS_MR ); ir ++ ) {
-            //  u[ umap[ ic + i + ir ] ] = packu[ tid * DKS_MC + i + ir ];
-            //}
+		  for ( i = 0, ip = 0; i < ib; i += DKS_MR, ip += DKS_PACK_MR ) {
+			// unpacku with multiple rhs.
+			unpacku_rhsxmc(
+				min( ib - i, DKS_MR ),
+				KS_RHS,
+				u,
+				KS_RHS,
+				&umap[ ic + i ],
+				&packu[ tid * DKS_PACK_MC * KS_RHS + ip * KS_RHS ]
+				);
           }
         }
       }

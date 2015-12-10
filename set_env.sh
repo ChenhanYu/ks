@@ -4,7 +4,8 @@ echo "GSKS_DIR = $GSKS_DIR"
 
 # Manually set the target architecture.
 export GSKS_ARCH_MAJOR=x86_64
-export GSKS_ARCH_MINOR=sandybridge
+#export GSKS_ARCH_MINOR=sandybridge
+export GSKS_ARCH_MINOR=haswell
 export GSKS_ARCH=$GSKS_ARCH_MAJOR/$GSKS_ARCH_MINOR
 echo "GSKS_ARCH = $GSKS_ARCH"
 

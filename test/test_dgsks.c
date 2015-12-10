@@ -179,7 +179,7 @@ void test_dgsks(
   // ------------------------------------------------------------------------
   // Test Variable Bandwidth Gaussian Kernel
   // ------------------------------------------------------------------------
-  if ( kernel->type = KS_GAUSSIAN_VAR_BANDWIDTH ) {
+  if ( kernel->type == KS_GAUSSIAN_VAR_BANDWIDTH ) {
     kernel->h = (double*)malloc( sizeof(double) * nx );
     for ( i = 0; i < nx; i ++ ) {
       kernel->h[ i ] = ( 1.0 + 0.5 / ( 1 + exp( -1.0 * XA2[ i ] ) ) );
@@ -303,39 +303,39 @@ int main( int argc, char *argv[] )
    * Setup kernel-dependent parameters. Now we only allow default values.
    */
   if ( !strcmp( type, "Gaussian" ) ) {
-    kernel.type = KS_GAUSSIAN;
-    kernel.scal = -0.5;
+	kernel.type = KS_GAUSSIAN;
+	kernel.scal = -0.5;
   }
   else if ( !strcmp( type, "Polynomial" ) ) {
-    kernel.type = KS_POLYNOMIAL;
-    kernel.powe = 3.0;
-    kernel.scal = 0.1;
-    kernel.cons = 0.1;
+	kernel.type = KS_POLYNOMIAL;
+	kernel.powe = 3.0;
+	kernel.scal = 0.1;
+	kernel.cons = 0.1;
   }
   else if ( !strcmp( type, "Laplace" ) ) {
-    kernel.type = KS_LAPLACE;
+	kernel.type = KS_LAPLACE;
   }
   else if ( !strcmp( type, "Var_bandwidth" ) ) {
-    kernel.type = KS_GAUSSIAN_VAR_BANDWIDTH;
+	kernel.type = KS_GAUSSIAN_VAR_BANDWIDTH;
   }
   else if ( !strcmp( type, "Tanh" ) ) {
-    kernel.type = KS_TANH;
-    kernel.scal = 0.1;
-    kernel.cons = 0.1;
+	kernel.type = KS_TANH;
+	kernel.scal = 0.1;
+	kernel.cons = 0.1;
   }
   else if ( !strcmp( type, "Quartic" ) ) {
-    kernel.type = KS_QUARTIC;
+	kernel.type = KS_QUARTIC;
   }
   else if ( !strcmp( type, "Multiquadratic" ) ) {
-    kernel.type = KS_MULTIQUADRATIC;
-    kernel.cons = 1.0 ;
+	kernel.type = KS_MULTIQUADRATIC;
+	kernel.cons = 1.0 ;
   }
   else if ( !strcmp( type, "Epanechnikov" ) ) {
-    kernel.type = KS_EPANECHNIKOV;
+	kernel.type = KS_EPANECHNIKOV;
   }  
   else {
-	  printf( "gsksMain(): kernel type mismatch %s\n", type );
-    exit( 1 );
+	printf( "gsksMain(): kernel type mismatch %s\n", type );
+	exit( 1 );
   }
 
   test_dgsks( &kernel, m, n, k );
