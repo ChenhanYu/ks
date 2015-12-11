@@ -308,7 +308,7 @@ int main( int argc, char *argv[] )
   }
   else if ( !strcmp( type, "Polynomial" ) ) {
 	kernel.type = KS_POLYNOMIAL;
-	kernel.powe = 3.0;
+	kernel.powe = 4.0;
 	kernel.scal = 0.1;
 	kernel.cons = 0.1;
   }

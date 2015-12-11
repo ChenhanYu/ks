@@ -3,6 +3,25 @@
 #include <ks.h>
 #include <avx_type.h>
 
+
+void tanh_int_s16x6(
+    int    k,
+    int    rhs,
+    float  *h,
+    float  *u,
+    float  *aa,
+    float  *a,
+    float  *bb,
+    float  *b,
+    float  *w,
+    float  *c,
+    ks_t   *ker,
+    aux_t  *aux
+    )
+{
+  printf( "tanh_int_s16x6 not yet implemented.\n" );
+}
+
 void tanh_int_d8x6(
     int    k,
     int    rhs,
