@@ -151,9 +151,9 @@ void gaussian_int_d8x6(
   c47_4.v = _mm256_mul_pd( a03.v, c47_4.v );
   c47_5.v = _mm256_mul_pd( a03.v, c47_5.v );
 
-  // Preload u03, u47
-  a03.v    = _mm256_load_pd( (double*)  u       );
-  a47.v    = _mm256_load_pd( (double*)( u + 4 ) );
+  // Prefetch u, w
+  __asm__ volatile( "prefetcht0 0(%0)    \n\t" : :"r"( u ) );
+  __asm__ volatile( "prefetcht0 0(%0)    \n\t" : :"r"( w ) );
 
   // c = exp( c )
   c03_0.v = _mm256_exp_pd( c03_0.v );
@@ -169,6 +169,10 @@ void gaussian_int_d8x6(
   c47_3.v = _mm256_exp_pd( c47_3.v );
   c47_4.v = _mm256_exp_pd( c47_4.v );
   c47_5.v = _mm256_exp_pd( c47_5.v );
+
+  // Preload u03, u47
+  a03.v    = _mm256_load_pd( (double*)  u       );
+  a47.v    = _mm256_load_pd( (double*)( u + 4 ) );
 
   // Multiple rhs weighted sum.
   #include<weighted_sum_int_d8x6.h>
