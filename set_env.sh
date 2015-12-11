@@ -4,8 +4,8 @@ echo "GSKS_DIR = $GSKS_DIR"
 
 # Manually set the target architecture.
 export GSKS_ARCH_MAJOR=x86_64
-#export GSKS_ARCH_MINOR=sandybridge
-export GSKS_ARCH_MINOR=haswell
+export GSKS_ARCH_MINOR=sandybridge
+#export GSKS_ARCH_MINOR=haswell
 export GSKS_ARCH=$GSKS_ARCH_MAJOR/$GSKS_ARCH_MINOR
 echo "GSKS_ARCH = $GSKS_ARCH"
 
@@ -29,5 +29,5 @@ echo "GSKS_MKL_DIR = $GSKS_MKL_DIR"
 
 # Parallel options
 export KMP_AFFINITY=compact
-export OMP_NUM_THREADS=1
-export KS_IC_NT=1
+export OMP_NUM_THREADS=10
+export KS_IC_NT=10
