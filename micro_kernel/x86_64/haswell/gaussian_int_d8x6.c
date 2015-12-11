@@ -50,7 +50,6 @@ void gaussian_int_d8x6(
     )
 {
   int    i;
-  double neg2 = -2.0, dzero = 0.0;
   double alpha = ker->scal;
   // 16 registers.
   v4df_t c03_0, c03_1, c03_2, c03_3, c03_4, c03_5;
@@ -59,6 +58,7 @@ void gaussian_int_d8x6(
 
   #include <rank_k_int_d8x6.h>
 
+  /*
   // Prefetch aa and bb
   __asm__ volatile( "prefetcht0 0(%0)    \n\t" : :"r"( aa ) );
   __asm__ volatile( "prefetcht0 0(%0)    \n\t" : :"r"( bb ) );
@@ -134,6 +134,9 @@ void gaussian_int_d8x6(
   c47_3.v = _mm256_max_pd( a03.v, c47_3.v );
   c47_4.v = _mm256_max_pd( a03.v, c47_4.v );
   c47_5.v = _mm256_max_pd( a03.v, c47_5.v );
+  */
+
+  #include <sq2nrm_int_d8x6.h>
 
   // Scale before the kernel evaluation
   a03.v   = _mm256_broadcast_sd( &alpha );
