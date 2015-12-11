@@ -27,6 +27,7 @@
     aux_t  *aux            \
     )
 
+void KERNEL1(rank_k_int_d8x6,double);
 void KERNEL1(rank_k_asm_d8x6,double);
 void KERNEL2(gaussian_int_d8x6,double);
 void KERNEL2(polynomial_int_d8x6,double);
@@ -39,6 +40,7 @@ void KERNEL2(epanechnikov_int_d8x6,double);
 
 void KERNEL1((*rankk),double)  = {
   rank_k_asm_d8x6
+  //rank_k_int_d8x6
 };
 
 void KERNEL2((*micro[ 8 ]),double) = {
