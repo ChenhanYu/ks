@@ -271,7 +271,7 @@ void omp_dgsks_list_separated_u_symmetric(
   //}
 
 
-  printf( "Call omp_dgsks_list\n" );
+  //printf( "Call omp_dgsks_list\n" );
 
   // Call omp_dgsks_list()
   omp_dgsks_list(
@@ -335,7 +335,7 @@ void omp_dgsks_list(
     }
   }
 
-  printf( "Finish Initialize u_local\n" );
+  //printf( "Finish Initialize u_local\n" );
 
 
   // Initialize workload
@@ -359,7 +359,7 @@ void omp_dgsks_list(
   }
   
 
-  printf( "Finish jobs distribution: %d workers\n", KS_NUM_THREAD );
+  //printf( "Finish jobs distribution: %d workers\n", KS_NUM_THREAD );
 
 
   // Dequeue in parallel with omp parallel for
@@ -406,6 +406,9 @@ void omp_dgsks_list(
   // Merge u_local back to u in sequential
   for ( int i = 0; i < KS_NUM_THREAD; i++ ) {
     for ( int j = 0; j < nu; j++ ) {
+	  if ( u_local[ i ][ j ] != u_local[ i ][ j ] ) {
+		printf( "gsks error: nan at ulocal[%d][%d]\n", i, j );
+	  }
       u[ j ] += u_local[ i ][ j ];
     }
   }

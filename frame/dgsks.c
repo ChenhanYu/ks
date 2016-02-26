@@ -408,6 +408,9 @@ void dgsks(
   packB2 = ks_malloc_aligned(      1, ( DKS_PACK_NC + 1 )           , sizeof(double) ); 
   packw  = ks_malloc_aligned( KS_RHS, ( DKS_PACK_NC + 1 )           , sizeof(double) ); 
 
+  // Initilize packA2 and packB2 from getting nan.
+  for ( j = 0; j < DKS_PACK_NC + 1; j ++ ) packB2[ j ] = 0.0;
+  for ( i = 0; i < DKS_PACK_MC + 1; i ++ ) packA2[ i ] = 0.0;
 
 
   switch ( kernel->type ) {

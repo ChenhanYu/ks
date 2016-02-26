@@ -118,4 +118,20 @@ void gaussian_int_d8x6(
 
   // Multiple rhs weighted sum.
   #include<weighted_sum_int_d8x6.h>
+
+  //if ( u[ 0 ] != u[ 0 ] ) printf( "u[ 0 ] nan\n" );
+  //if ( u[ 1 ] != u[ 1 ] ) printf( "u[ 1 ] nan\n" );
+  //if ( u[ 2 ] != u[ 2 ] ) printf( "u[ 2 ] nan\n" );
+  //if ( u[ 3 ] != u[ 3 ] ) printf( "u[ 3 ] nan\n" );
+  //if ( u[ 4 ] != u[ 4 ] ) printf( "u[ 4 ] nan\n" );
+  //if ( u[ 5 ] != u[ 5 ] ) printf( "u[ 5 ] nan\n" );
+  //if ( u[ 6 ] != u[ 6 ] ) printf( "u[ 6 ] nan\n" );
+  //if ( u[ 7 ] != u[ 7 ] ) printf( "u[ 7 ] nan\n" );
+
+  //if ( w[ 0 ] != w[ 0 ] ) printf( "w[ 0 ] nan\n" );
+  //if ( w[ 1 ] != w[ 1 ] ) printf( "w[ 1 ] nan\n" );
+  //if ( w[ 2 ] != w[ 2 ] ) printf( "w[ 2 ] nan\n" );
+  //if ( w[ 3 ] != w[ 3 ] ) printf( "w[ 3 ] nan\n" );
+  //if ( w[ 4 ] != w[ 4 ] ) printf( "w[ 4 ] nan\n" );
+  //if ( w[ 5 ] != w[ 5 ] ) printf( "w[ 5 ] nan\n" );
 }
