@@ -1,6 +1,7 @@
 #include <math.h>
 #include <immintrin.h> // AVX
 #include <ks.h>
+#include <gsks_internal.h>
 #include <avx_type.h>
 
 void laplace_int_s16x6(

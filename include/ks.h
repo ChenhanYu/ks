@@ -57,15 +57,6 @@ typedef enum {
   KS_EPANECHNIKOV
 } ks_type;
 
-struct aux_s {
-  double *a_next;
-  double *b_next;
-  double *c_buff;
-  int    pc;
-};
-
-typedef struct aux_s aux_t;
-
 struct kernel_s {
   ks_type type;
   double powe;

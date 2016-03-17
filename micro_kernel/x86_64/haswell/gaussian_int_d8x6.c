@@ -1,6 +1,7 @@
 #include <math.h>
 #include <immintrin.h> // AVX
 #include <ks.h>
+#include <gsks_internal.h>
 #include <avx_type.h>
 
 void gaussian_ref_d8x6(

@@ -40,6 +40,7 @@
 
 #include <immintrin.h> // AVX
 #include <ks.h>
+#include <gsks_internal.h>
 #include <avx_type.h>
 
 void ks_epanechnikov_int_d8x4(

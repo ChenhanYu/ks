@@ -52,6 +52,7 @@
  * */
 
 #include <ks.h>
+#include <gsks_internal.h>
 #include <gsks_config.h>
 #include <gsks_kernel.h>
 

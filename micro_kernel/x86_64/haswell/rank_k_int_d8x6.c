@@ -57,6 +57,7 @@
 
 #include <immintrin.h> // AVX
 #include <ks.h>
+#include <gsks_internal.h>
 #include <avx_type.h>
 
 void rank_k_asm_s16x6(
