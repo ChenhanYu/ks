@@ -8,7 +8,7 @@
 void epanechnikov_int_s16x6(
     int    k,
     int    rhs,
-    float  *h,
+    //float  *h,
     float  *u,
     float  *aa,
     float  *a,
@@ -26,7 +26,7 @@ void epanechnikov_int_s16x6(
 void epanechnikov_int_d8x6(
     int    k,
     int    rhs,
-    double *h,
+    //double *h,
     double *u,
     double *aa,
     double *a,

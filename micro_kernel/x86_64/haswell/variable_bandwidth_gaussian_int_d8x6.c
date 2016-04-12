@@ -7,7 +7,7 @@
 void variable_bandwidth_gaussian_int_s16x6(
     int    k,
     int    rhs,
-    float  *h,
+    //float  *h,
     float  *u,
     float  *aa,
     float  *a,
@@ -25,7 +25,7 @@ void variable_bandwidth_gaussian_int_s16x6(
 void variable_bandwidth_gaussian_int_d8x6(
     int    k,
     int    rhs,
-    double *h,
+    //double *h,
     double *u,
     double *aa,
     double *a,
@@ -38,7 +38,8 @@ void variable_bandwidth_gaussian_int_d8x6(
     )
 {
   int    i;
-  double *alpha = h;
+  double *hi = aux->hi;
+  double *hj = aux->hj;
 
   // 16 registers.
   v4df_t c03_0, c03_1, c03_2, c03_3, c03_4, c03_5;
@@ -49,29 +50,46 @@ void variable_bandwidth_gaussian_int_d8x6(
   #include <sq2nrm_int_d8x6.h>
 
   // Scale before the kernel evaluation
-  b0.v    = _mm256_broadcast_sd( (double*)( alpha + 0 ) );
+  b0.v    = _mm256_broadcast_sd( (double*)( hj + 0 ) );
   c03_0.v = _mm256_mul_pd( b0.v, c03_0.v );
   c47_0.v = _mm256_mul_pd( b0.v, c47_0.v );
 
-  b1.v    = _mm256_broadcast_sd( (double*)( alpha + 1 ) );
+  b1.v    = _mm256_broadcast_sd( (double*)( hj + 1 ) );
   c03_1.v = _mm256_mul_pd( b1.v, c03_1.v );
   c47_1.v = _mm256_mul_pd( b1.v, c47_1.v );
 
-  b0.v    = _mm256_broadcast_sd( (double*)( alpha + 2 ) );
+  b0.v    = _mm256_broadcast_sd( (double*)( hj + 2 ) );
   c03_2.v = _mm256_mul_pd( b0.v, c03_2.v );
   c47_2.v = _mm256_mul_pd( b0.v, c47_2.v );
 
-  b1.v    = _mm256_broadcast_sd( (double*)( alpha + 3 ) );
+  b1.v    = _mm256_broadcast_sd( (double*)( hj + 3 ) );
   c03_3.v = _mm256_mul_pd( b1.v, c03_3.v );
   c47_3.v = _mm256_mul_pd( b1.v, c47_3.v );
 
-  b0.v    = _mm256_broadcast_sd( (double*)( alpha + 4 ) );
+  b0.v    = _mm256_broadcast_sd( (double*)( hj + 4 ) );
   c03_4.v = _mm256_mul_pd( b0.v, c03_4.v );
   c47_4.v = _mm256_mul_pd( b0.v, c47_4.v );
 
-  b1.v    = _mm256_broadcast_sd( (double*)( alpha + 5 ) );
+  b1.v    = _mm256_broadcast_sd( (double*)( hj + 5 ) );
   c03_5.v = _mm256_mul_pd( b1.v, c03_5.v );
   c47_5.v = _mm256_mul_pd( b1.v, c47_5.v );
+
+  a03.v    = _mm256_load_pd( (double*)  hi       );
+  a47.v    = _mm256_load_pd( (double*)( hi + 4 ) );
+
+  c03_0.v = _mm256_mul_pd( a03.v, c03_0.v );
+  c03_1.v = _mm256_mul_pd( a03.v, c03_1.v );
+  c03_2.v = _mm256_mul_pd( a03.v, c03_2.v );
+  c03_3.v = _mm256_mul_pd( a03.v, c03_3.v );
+  c03_4.v = _mm256_mul_pd( a03.v, c03_4.v );
+  c03_5.v = _mm256_mul_pd( a03.v, c03_5.v );
+  c47_0.v = _mm256_mul_pd( a47.v, c47_0.v );
+  c47_1.v = _mm256_mul_pd( a47.v, c47_1.v );
+  c47_2.v = _mm256_mul_pd( a47.v, c47_2.v );
+  c47_3.v = _mm256_mul_pd( a47.v, c47_3.v );
+  c47_4.v = _mm256_mul_pd( a47.v, c47_4.v );
+  c47_5.v = _mm256_mul_pd( a47.v, c47_5.v );
+
 
   // Prefetch u, w
   __asm__ volatile( "prefetcht0 0(%0)    \n\t" : :"r"( u ) );

@@ -15,7 +15,6 @@
   name(                    \
     int    k,              \
     int    rhs,            \
-    type   *h,             \
     type   *u,             \
     type   *a,             \
     type   *aa,            \

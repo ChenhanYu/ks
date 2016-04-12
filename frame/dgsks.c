@@ -301,10 +301,11 @@ void dgsks_macro_kernel(
     double *packu,
     double *packA,
     double *packA2,
+	double *packAh,
     double *packB,
     double *packB2,
+	double *packBh,
     double *packw,
-    double *packh,
     double *packC,
     int    ldc,
     int    pc
@@ -321,10 +322,11 @@ void dgsks_macro_kernel(
       if ( i + DKS_MR >= m ) {
         aux.b_next += DKS_PACK_NR * k;
       }
+	  aux.hi = packAh + ip;
+	  aux.hj = packBh + jp;
       ( *micro[ kernel->type ] )(
           k,
           KS_RHS,
-          packh  + jp,
           packu  + ip * KS_RHS,
           packA2 + ip,
           packA  + ip * k,
@@ -384,7 +386,8 @@ void dgsks(
   int    ir, jr;
   int    pack_norm, pack_bandwidth, ks_ic_nt;
   int    ldc, padn;
-  double *packA, *packB, *packC, *packh, *packw, *packu, *packA2, *packB2;
+  double *packA, *packB, *packC, *packw, *packu;
+  double *packA2 = NULL, *packB2 = NULL, *packAh = NULL, *packBh = NULL;
   char   *str;
 
   // Early return if possible
@@ -421,12 +424,13 @@ void dgsks(
       pack_norm      = 1;
       break;
     case KS_GAUSSIAN_VAR_BANDWIDTH:
-      if ( !kernel->h ) {
+      if ( !kernel->hi || !kernel->hj ) {
         printf( "Error dgsks(): bandwidth vector has been initialized yet.\n" );
       }
       pack_bandwidth = 1;
       pack_norm      = 1;
-      packh          = ks_malloc_aligned( 1, ( DKS_PACK_NC + 1 ), sizeof(double) ); 
+      packAh         = ks_malloc_aligned( 1, ( DKS_PACK_MC + 1 ) * ks_ic_nt, sizeof(double) ); 
+      packBh         = ks_malloc_aligned( 1, ( DKS_PACK_NC + 1 ), sizeof(double) ); 
       break;
     case KS_POLYNOMIAL:
       pack_bandwidth = 0;
@@ -497,7 +501,7 @@ void dgsks(
                 packB2[ jp + jr ] = XB2[ bmap[ jc + j + jr ] ];
               }
               if ( pack_bandwidth ) {
-                packh[ jp + jr ] = kernel->h[ bmap[ jc + j + jr ] ];
+                packBh[ jp + jr ] = kernel->hj[ bmap[ jc + j + jr ] ];
               }
             }
           }
@@ -536,6 +540,9 @@ void dgsks(
                 if ( pack_norm ) {
                   packA2[ tid * DKS_PACK_MC + ip + ir ] = XA2[ amap[ ic + i + ir ] ];
                 }
+                if ( pack_bandwidth ) {
+                  packAh[ tid * DKS_PACK_MC + ip + ir ] = kernel->hi[ amap[ ic + i + ir ] ];
+				}
               }
             }
             packA_kcxmc(
@@ -570,10 +577,11 @@ void dgsks(
                 packu  + tid * DKS_PACK_MC * KS_RHS,
                 packA  + tid * DKS_PACK_MC * pb,
                 packA2 + tid * DKS_PACK_MC,
+                packAh + tid * DKS_PACK_MC,
                 packB,
                 packB2,
+                packBh,
                 packw,
-                packh,
                 packC  + ic * padn,                   // packed
                 ( ( ib - 1 ) / DKS_MR + 1 ) * DKS_MR, // packed ldc
                 pc
@@ -622,7 +630,7 @@ void dgsks(
               packB2[ jp + jr ] = XB2[ bmap[ jc + j + jr ] ];
             }
             if ( pack_bandwidth ) {
-              packh[ jp + jr ] = kernel->h[ bmap[ jc + j + jr ] ];
+              packBh[ jp + jr ] = kernel->hj[ bmap[ jc + j + jr ] ];
             }
           }
 
@@ -656,13 +664,16 @@ void dgsks(
               );
 
             for ( ir = 0; ir < min( ib - i, DKS_MR ); ir ++ ) {
-              if ( pack_norm ) {
-                packA2[ tid * DKS_PACK_MC + ip + ir ] = XA2[ amap[ ic + i + ir ] ];
-              }
-            }
-            packA_kcxmc(
-                min( ib - i, DKS_MR ),
-                pb,
+			  if ( pack_norm ) {
+				packA2[ tid * DKS_PACK_MC + ip + ir ] = XA2[ amap[ ic + i + ir ] ];
+			  }
+			  if ( pack_bandwidth ) {
+				packAh[ tid * DKS_PACK_MC + ip + ir ] = kernel->hi[ amap[ ic + i + ir ] ];
+			  }
+			}
+			packA_kcxmc(
+				min( ib - i, DKS_MR ),
+				pb,
                 XA,
                 k,
                 &amap[ ic + i ],
@@ -678,10 +689,11 @@ void dgsks(
               packu  + tid * DKS_PACK_MC * KS_RHS,
               packA  + tid * DKS_PACK_MC * pb,
               packA2 + tid * DKS_PACK_MC,
+              packAh + tid * DKS_PACK_MC,
               packB,
               packB2,
+              packBh,
               packw,
-              packh,
               NULL,
               0,
               pc
@@ -724,7 +736,8 @@ void dgsks(
     case KS_GAUSSIAN:
       break;
     case KS_GAUSSIAN_VAR_BANDWIDTH:
-      free( packh );
+      free( packAh );
+      free( packBh );
       break;
     case KS_POLYNOMIAL:
       break;
@@ -775,7 +788,8 @@ void dgsks_wrapper(
   kernel.type = type;
   kernel.scal = scal;
   kernel.powe = powe;
-  kernel.h    = h;
+  kernel.hi   = h;
+  kernel.hj   = h;
   dgsks(
     &kernel,
     m,

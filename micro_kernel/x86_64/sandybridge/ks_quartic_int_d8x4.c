@@ -7,7 +7,6 @@
 void ks_quartic_int_d8x4(
     int    k,
     int    rhs,
-    double *h,   // NOP
     double *u,
     double *aa,
     double *a,

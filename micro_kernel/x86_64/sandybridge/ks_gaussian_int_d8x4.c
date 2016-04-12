@@ -6,7 +6,6 @@
 void ks_gaussian_int_d8x4(
     int    k,
     int    rhs,
-    double *h,
     double *u,
     double *aa,
     double *a,

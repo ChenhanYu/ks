@@ -120,7 +120,7 @@ void dgsks_ref(
       break;
     case KS_GAUSSIAN_VAR_BANDWIDTH:
       rank_k_scale = -2.0;
-      if ( !kernel->h ) {
+      if ( !kernel->hi || !kernel->hj  ) {
         printf( "Error dgsks(): bandwidth vector has been initialized yet.\n" );
       }
       break;
@@ -260,7 +260,8 @@ void dgsks_ref(
         for ( i = 0; i < m; i ++ ) {
           Cs[ j * m + i ] += XA2[ alpha[ i ] ];
           Cs[ j * m + i ] += XB2[ beta[ j ] ];
-          Cs[ j * m + i ] *= kernel->h[ beta[ j ] ];
+          Cs[ j * m + i ] *= kernel->hi[ alpha[ i ] ];
+          Cs[ j * m + i ] *= kernel->hj[ beta[ j ] ];
         }
 #ifdef USE_VML
         vdExp( m, Cs + j * m, Cs + j * m );
@@ -533,7 +534,8 @@ void dgsks_ref_wrapper(
   kernel.type = type;
   kernel.scal = scal;
   kernel.powe = powe;
-  kernel.h    = h;
+  kernel.hi   = h;
+  kernel.hj   = h;
   dgsks_ref(
     &kernel,
     m,

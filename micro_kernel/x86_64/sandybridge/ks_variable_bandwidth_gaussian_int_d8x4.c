@@ -7,7 +7,6 @@
 void ks_variable_bandwidth_gaussian_int_d8x4(
     int    k,
     int    rhs,
-    double *h,
     double *u,
     double *aa,
     double *a,
@@ -22,7 +21,8 @@ void ks_variable_bandwidth_gaussian_int_d8x4(
   int    i, rhs_left;
   double neg2   = -2.0;
   double dzero  = 0.0;
-  double *alpha = h;
+  double *hi = aux->hi;
+  double *hj = aux->hj;
 
   //printf( "ks_variable_bandwidth_gaussian_int_d8x4\n" );
 
@@ -122,22 +122,33 @@ void ks_variable_bandwidth_gaussian_int_d8x4(
 
 
   // Scale before the kernel evaluation
-  aa_tmp.v = _mm256_broadcast_sd( (double*)( alpha + 0 ) );
+  aa_tmp.v = _mm256_broadcast_sd( (double*)( hj + 0 ) );
   c03_0.v  = _mm256_mul_pd( aa_tmp.v, c03_0.v );
   c47_0.v  = _mm256_mul_pd( aa_tmp.v, c47_0.v );
 
-  aa_tmp.v = _mm256_broadcast_sd( (double*)( alpha + 1 ) );
+  aa_tmp.v = _mm256_broadcast_sd( (double*)( hj + 1 ) );
   c03_1.v  = _mm256_mul_pd( aa_tmp.v, c03_1.v );
   c47_1.v  = _mm256_mul_pd( aa_tmp.v, c47_1.v );
 
-  aa_tmp.v = _mm256_broadcast_sd( (double*)( alpha + 2 ) );
+  aa_tmp.v = _mm256_broadcast_sd( (double*)( hj + 2 ) );
   c03_2.v  = _mm256_mul_pd( aa_tmp.v, c03_2.v );
   c47_2.v  = _mm256_mul_pd( aa_tmp.v, c47_2.v );
 
-  aa_tmp.v = _mm256_broadcast_sd( (double*)( alpha + 3 ) );
+  aa_tmp.v = _mm256_broadcast_sd( (double*)( hj + 3 ) );
   c03_3.v  = _mm256_mul_pd( aa_tmp.v, c03_3.v );
   c47_3.v  = _mm256_mul_pd( aa_tmp.v, c47_3.v );
 
+  u03.v    = _mm256_load_pd( (double*) hi );
+  u47.v    = _mm256_load_pd( (double*)( hi + 4 ) );
+
+  c03_0.v  = _mm256_mul_pd( u03.v, c03_0.v );
+  c03_1.v  = _mm256_mul_pd( u03.v, c03_1.v );
+  c03_2.v  = _mm256_mul_pd( u03.v, c03_2.v );
+  c03_3.v  = _mm256_mul_pd( u03.v, c03_3.v );
+  c47_0.v  = _mm256_mul_pd( u47.v, c47_0.v );
+  c47_1.v  = _mm256_mul_pd( u47.v, c47_1.v );
+  c47_2.v  = _mm256_mul_pd( u47.v, c47_2.v );
+  c47_3.v  = _mm256_mul_pd( u47.v, c47_3.v );
 
   // Preload u03, u47
   u03.v    = _mm256_load_pd( (double*)u );

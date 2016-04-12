@@ -7,7 +7,7 @@
 void gaussian_ref_d8x6(
     int    k,
     int    rhs,
-    double *h,
+    //double *h,
     double *u,
     double *aa,
     double *a,
@@ -38,7 +38,7 @@ void gaussian_ref_d8x6(
 void gaussian_int_s16x6(
     int    k,
     int    rhs,
-    float  *h,
+    //float  *h,
     float  *u,
     float  *aa,
     float  *a,
@@ -56,7 +56,7 @@ void gaussian_int_s16x6(
 void gaussian_int_d8x6(
     int    k,
     int    rhs,
-    double *h,
+    //double *h,
     double *u,
     double *aa,
     double *a,
