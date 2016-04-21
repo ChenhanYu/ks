@@ -20,6 +20,7 @@ void ks_variable_bandwidth_gaussian_int_d8x4(
 {
   int    i, rhs_left;
   double neg2   = -2.0;
+  double neghalf = -0.5;
   double dzero  = 0.0;
   double *hi = aux->hi;
   double *hj = aux->hj;
@@ -119,7 +120,16 @@ void ks_variable_bandwidth_gaussian_int_d8x4(
   c47_2.v  = _mm256_max_pd( c_tmp.v, c47_2.v );
   c47_3.v  = _mm256_max_pd( c_tmp.v, c47_3.v );
 
-
+  // Scale -1.0
+  aa_tmp.v = _mm256_broadcast_sd( &neghalf );
+  c03_0.v  = _mm256_mul_pd( aa_tmp.v, c03_0.v );
+  c03_1.v  = _mm256_mul_pd( aa_tmp.v, c03_1.v );
+  c03_2.v  = _mm256_mul_pd( aa_tmp.v, c03_2.v );
+  c03_3.v  = _mm256_mul_pd( aa_tmp.v, c03_3.v );
+  c47_0.v  = _mm256_mul_pd( aa_tmp.v, c47_0.v );
+  c47_1.v  = _mm256_mul_pd( aa_tmp.v, c47_1.v );
+  c47_2.v  = _mm256_mul_pd( aa_tmp.v, c47_2.v );
+  c47_3.v  = _mm256_mul_pd( aa_tmp.v, c47_3.v );
 
   // Scale before the kernel evaluation
   aa_tmp.v = _mm256_broadcast_sd( (double*)( hj + 0 ) );

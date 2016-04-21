@@ -260,6 +260,7 @@ void dgsks_ref(
         for ( i = 0; i < m; i ++ ) {
           Cs[ j * m + i ] += XA2[ alpha[ i ] ];
           Cs[ j * m + i ] += XB2[ beta[ j ] ];
+          Cs[ j * m + i ] *= -0.5;
           Cs[ j * m + i ] *= kernel->hi[ alpha[ i ] ];
           Cs[ j * m + i ] *= kernel->hj[ beta[ j ] ];
         }

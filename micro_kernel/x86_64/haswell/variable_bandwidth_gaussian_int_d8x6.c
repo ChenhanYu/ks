@@ -38,6 +38,7 @@ void variable_bandwidth_gaussian_int_d8x6(
     )
 {
   int    i;
+  double neghalf = -0.5;
   double *hi = aux->hi;
   double *hj = aux->hj;
 
@@ -48,6 +49,22 @@ void variable_bandwidth_gaussian_int_d8x6(
 
   #include <rank_k_int_d8x6.h>
   #include <sq2nrm_int_d8x6.h>
+
+  // Scale -1.0
+  a03.v   = _mm256_broadcast_sd( &neghalf );
+  c03_0.v = _mm256_mul_pd( a03.v, c03_0.v );
+  c03_1.v = _mm256_mul_pd( a03.v, c03_1.v );
+  c03_2.v = _mm256_mul_pd( a03.v, c03_2.v );
+  c03_3.v = _mm256_mul_pd( a03.v, c03_3.v );
+  c03_4.v = _mm256_mul_pd( a03.v, c03_4.v );
+  c03_5.v = _mm256_mul_pd( a03.v, c03_5.v );
+
+  c47_0.v = _mm256_mul_pd( a03.v, c47_0.v );
+  c47_1.v = _mm256_mul_pd( a03.v, c47_1.v );
+  c47_2.v = _mm256_mul_pd( a03.v, c47_2.v );
+  c47_3.v = _mm256_mul_pd( a03.v, c47_3.v );
+  c47_4.v = _mm256_mul_pd( a03.v, c47_4.v );
+  c47_5.v = _mm256_mul_pd( a03.v, c47_5.v );
 
   // Scale before the kernel evaluation
   b0.v    = _mm256_broadcast_sd( (double*)( hj + 0 ) );

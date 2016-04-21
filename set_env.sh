@@ -3,11 +3,11 @@ export GSKS_DIR=$PWD
 echo "GSKS_DIR = $GSKS_DIR"
 
 ## Manually set the target architecture.
-#export GSKS_ARCH_MAJOR=x86_64
-#export GSKS_ARCH_MINOR=sandybridge
-
 export GSKS_ARCH_MAJOR=x86_64
-export GSKS_ARCH_MINOR=haswell
+export GSKS_ARCH_MINOR=sandybridge
+
+# export GSKS_ARCH_MAJOR=x86_64
+# export GSKS_ARCH_MINOR=haswell
 
 
 export GSKS_ARCH=$GSKS_ARCH_MAJOR/$GSKS_ARCH_MINOR
@@ -27,8 +27,8 @@ echo "GSKS_USE_VML = $GSKS_USE_VML"
 
 
 ## Manually set the mkl path
-# export GSKS_MKL_DIR=$TACC_MKL_DIR
-export GSKS_MKL_DIR=/opt/intel/mkl
+export GSKS_MKL_DIR=$TACC_MKL_DIR
+# export GSKS_MKL_DIR=/opt/intel/mkl
 echo "GSKS_MKL_DIR = $GSKS_MKL_DIR"
 
 ## Parallel options
