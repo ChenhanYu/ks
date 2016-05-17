@@ -65,6 +65,7 @@ struct kernel_s {
   // The following variables are designed for the variable gaussian kernel.
   double *hi;
   double *hj;
+  double *h;
 };
 
 typedef struct kernel_s ks_t;
