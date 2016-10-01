@@ -27,6 +27,10 @@
 #include <ks.h>
 #include <gsks_config.h>
 
+#ifdef GSKS_MIC_AVX512
+#include <hbwmalloc.h>
+#endif
+
 double *ks_malloc_aligned(
     int    m,
     int    n,
@@ -36,7 +40,11 @@ double *ks_malloc_aligned(
   double *ptr;
   int    err;
 
-  err = posix_memalign( (void**)&ptr, (size_t)DKS_SIMD_ALIGN_SIZE, size * m * n );
+#ifdef GSKS_MIC_AVX512
+  err = hbw_posix_memalign( (void**)&ptr, (size_t)DKS_SIMD_ALIGN_SIZE, size * m * n );
+#else
+  err = posix_memalign(     (void**)&ptr, (size_t)DKS_SIMD_ALIGN_SIZE, size * m * n );
+#endif
 
   if ( err ) {
     printf( "ks_malloc_aligned(): posix_memalign() failures" );

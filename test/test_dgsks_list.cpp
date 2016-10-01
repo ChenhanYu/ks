@@ -158,21 +158,21 @@ void test_dgsks_list(
   std::cout << "Check point brfore kernel\n";
 
   // Test Gaussian Kernel
-  //kernel.type = KS_GAUSSIAN;
-  //kernel.scal = -0.5;
+  kernel.type = KS_GAUSSIAN;
+  kernel.scal = -0.5;
   //kernel.scal = -5000.0;
 
 
-  kernel.type = KS_GAUSSIAN_VAR_BANDWIDTH;
-  kernel.hi = (double*)malloc( sizeof(double) * nx );
-  kernel.hj = (double*)malloc( sizeof(double) * nx );
-  for ( i = 0; i < nx; i ++ ) {
-    //kernel.h[ i ] = -0.5;
-    //kernel.h[ i ] = ( -0.5 * i ) / 1000.0 ;
-    kernel.hi[ i ] = ( 1.0 + 0.5 / ( 1 + exp( -1.0 * XA2[ i ] ) ) );
-    kernel.hi[ i ] = -1.0 / ( 2.0 * kernel.hi[ i ] * kernel.hi[ i ] );
-	kernel.hj[ i ] = kernel.hi[ i ];
-  }
+  //kernel.type = KS_GAUSSIAN_VAR_BANDWIDTH;
+  //kernel.hi = (double*)malloc( sizeof(double) * nx );
+  //kernel.hj = (double*)malloc( sizeof(double) * nx );
+  //for ( i = 0; i < nx; i ++ ) {
+  //  //kernel.h[ i ] = -0.5;
+  //  //kernel.h[ i ] = ( -0.5 * i ) / 1000.0 ;
+  //  kernel.hi[ i ] = ( 1.0 + 0.5 / ( 1 + exp( -1.0 * XA2[ i ] ) ) );
+  //  kernel.hi[ i ] = -1.0 / ( 2.0 * kernel.hi[ i ] * kernel.hi[ i ] );
+  //  kernel.hj[ i ] = kernel.hi[ i ];
+  //}
 
   //printf( "after allocate h vector\n" );
 

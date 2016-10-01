@@ -602,8 +602,11 @@ void dgsks(
         }
       }
     }
-
+#ifdef GSKS_MIC_AVX512
+    hbw_free( packC );
+#else
     free( packC );
+#endif
   }
   else {
 
@@ -720,12 +723,21 @@ void dgsks(
   // -----------------------------------------------------------------
   // Free all packing buffers.
   // -----------------------------------------------------------------
+#ifdef GSKS_MIC_AVX512
+  hbw_free( packA );
+  hbw_free( packB );
+  hbw_free( packu );
+  hbw_free( packw );
+  hbw_free( packA2 );
+  hbw_free( packB2 );
+#else
   free( packA );
   free( packB );
   free( packu );
   free( packw );
   free( packA2 );
   free( packB2 );
+#endif
   // -----------------------------------------------------------------
 
 
@@ -736,8 +748,13 @@ void dgsks(
     case KS_GAUSSIAN:
       break;
     case KS_GAUSSIAN_VAR_BANDWIDTH:
+#ifdef GSKS_MIC_AVX512
+      hbw_free( packAh );
+      hbw_free( packBh );
+#else
       free( packAh );
       free( packBh );
+#endif
       break;
     case KS_POLYNOMIAL:
       break;

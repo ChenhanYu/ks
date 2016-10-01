@@ -44,7 +44,7 @@
 #include <math.h>
 
 #define KS_RHS 1
-#define KS_NUM_THREAD 20
+#define KS_NUM_THREAD 68
 
 typedef enum { 
   KS_GAUSSIAN, 

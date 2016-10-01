@@ -31,7 +31,12 @@
 #include <math.h>
 #include <ks.h>
 
-#define NUM_POINTS 10240
+#ifdef GSKS_MIC_AVX512
+#include <hbwmalloc.h>
+#endif
+
+
+#define NUM_POINTS 32000
 #define GFLOPS 1073741824 
 #define TOLERANCE 1E-13
 
@@ -109,6 +114,17 @@ void test_dgsks(
   // ------------------------------------------------------------------------
   // Memory allocation for all common buffers
   // ------------------------------------------------------------------------
+#ifdef GSKS_MIC_AVX512
+  amap = (int*)hbw_malloc( sizeof(int) * m );
+  umap = (int*)hbw_malloc( sizeof(int) * m );
+  bmap = (int*)hbw_malloc( sizeof(int) * n );
+  wmap = (int*)hbw_malloc( sizeof(int) * n );
+  XA   = (double*)hbw_malloc( sizeof(double) * k * nx );   // k   leading
+  XA2  = (double*)hbw_malloc( sizeof(double) * nx );
+  u    = (double*)hbw_malloc( sizeof(double) * nx * rhs ); // rhs leading
+  w    = (double*)hbw_malloc( sizeof(double) * nx * rhs ); // rhs leading
+  umkl = (double*)hbw_malloc( sizeof(double) * nx * rhs ); // rhs leading
+#else
   amap = (int*)malloc( sizeof(int) * m );
   umap = (int*)malloc( sizeof(int) * m );
   bmap = (int*)malloc( sizeof(int) * n );
@@ -118,6 +134,7 @@ void test_dgsks(
   u    = (double*)malloc( sizeof(double) * nx * rhs ); // rhs leading
   w    = (double*)malloc( sizeof(double) * nx * rhs ); // rhs leading
   umkl = (double*)malloc( sizeof(double) * nx * rhs ); // rhs leading
+#endif
   // ------------------------------------------------------------------------
 
 
@@ -133,17 +150,17 @@ void test_dgsks(
   }
 
   for ( i = 0; i < m; i ++ ) {
-    amap[ i ] = i * 2;
-    //amap[ i ] = i;
-    umap[ i ] = i * 2;
-    //umap[ i ] = i;
+    //amap[ i ] = i * 2;
+    amap[ i ] = i;
+    //umap[ i ] = i * 2;
+    umap[ i ] = i;
   }
 
   for ( j = 0; j < n; j ++ ) {
-    bmap[ j ] = j * 2 + 1;
-    //bmap[ j ] = j;
-    wmap[ j ] = j * 2 + 1;
-    //wmap[ j ] = j;
+    //bmap[ j ] = j * 2 + 1;
+    bmap[ j ] = j;
+    //wmap[ j ] = j * 2 + 1;
+    wmap[ j ] = j;
   }
 
   // random[ 0, 0.1 ]

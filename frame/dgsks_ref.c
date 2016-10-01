@@ -48,6 +48,10 @@
 #include <math.h>
 #include <ks.h>
 
+#ifdef GSKS_MIC_AVX512
+#include <hbwmalloc.h>
+#endif
+
 #ifdef USE_VML
 #include <mkl.h>
 #endif
@@ -126,7 +130,12 @@ void dgsks_ref(
       break;
     case KS_POLYNOMIAL:
       rank_k_scale = 1.0;
+#ifdef GSKS_MIC_AVX512
+      powe = (double*)hbw_malloc( sizeof(double) * m * n );
+#else
       powe = (double*)malloc( sizeof(double) * m * n );
+#endif
+      #pragma omp parallel for
       for ( i = 0; i < m * n; i++ ) powe[ i ] = kernel->powe;
       break;
     case KS_LAPLACE:
@@ -137,7 +146,12 @@ void dgsks_ref(
       kernel->powe = 0.5 * ( 2.0 - (double)k );
       kernel->scal = tgamma( 0.5 * k + 1.0 ) / 
         ( (double)k * (double)( k - 2 ) * pow( M_PI, 0.5 * k ) );
+#ifdef GSKS_MIC_AVX512
+      powe = (double*)hbw_malloc( sizeof(double) * m * n );
+#else
       powe = (double*)malloc( sizeof(double) * m * n );
+#endif
+      #pragma omp parallel for
       for ( i = 0; i < m * n; i++ ) powe[ i ] = kernel->powe;
       //printf( "powe = %lf, scal = %lf\n", kernel->powe, kernel->scal );
       break;
@@ -296,6 +310,8 @@ void dgsks_ref(
           for ( i = 0; i < m; i ++ ) {
             Cs[ j * m + i ] *= kernel->scal;
             Cs[ j * m + i ] += kernel->cons;
+		  }
+          for ( i = 0; i < m; i ++ ) {
             Cs[ j * m + i ] = Cs[ j * m + i ] * Cs[ j * m + i ];
             Cs[ j * m + i ] = Cs[ j * m + i ] * Cs[ j * m + i ];
           }
@@ -486,10 +502,18 @@ void dgsks_ref(
     case KS_GAUSSIAN_VAR_BANDWIDTH:
       break;
     case KS_POLYNOMIAL:
+#ifdef GSKS_MIC_AVX512
+      hbw_free( powe );
+#else
       free( powe );
+#endif
       break;
     case KS_LAPLACE:
+#ifdef GSKS_MIC_AVX512
+      hbw_free( powe );
+#else
       free( powe );
+#endif
       break;
     case KS_TANH:
       break;
